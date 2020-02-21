@@ -1,0 +1,91 @@
+doctype html
+head
+	// Required meta tags
+	meta(charset='utf-8')
+	meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+	// UIkit CSS
+	link(rel='stylesheet' href='./stylesheets/uikit.css')
+	// UIkit JS
+	script(src='./scripts/uikit.js')
+	script(src='./scripts/uikit-icons.js')
+	title File Server
+	style.
+		@font-face {
+		font-family: 'Source Sans Pro';
+		src: local('SourceSansPro'),
+		url('fonts/SourceSansPro-Regular.ttf')
+		format('truetype');
+		}
+		body {
+		font-family: 'Source Sans Pro';
+		}
+body
+	header
+		div(uk-sticky='animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky uk-navbar-transparent; cls-inactive: uk-navbar-transparent uk-light; top: 200')
+			nav.uk-navbar-container.uk-background-secondary.uk-padding-small(uk-navbar='')
+				.uk-navbar-center
+					.uk-navbar-logo
+						| File Server
+	.uk-navbar-item
+		ul.uk-tab-bottom(uk-tab='animation: uk-animation-slide-bottom, uk-animation-slide-top; connect: .main' uk-switcher='')
+			li.uk-active
+				a(href='#') Recieve
+			li
+				a(href='#') Send
+	ul.uk-switcher.main.uk-align-center.uk-width-1-1
+		li
+			#downloadList
+				|	!{code}
+		li
+			#uploadArea.js-upload.uk-placeholder.uk-text-center
+				span(uk-icon='icon: cloud-upload')
+				span.uk-text-middle Send files by dropping them here or 
+				div(uk-form-custom='')
+					input(type='file' multiple='')
+					span.uk-link selecting them
+			progress#js-progressbar.uk-progress(value='0' max='100' hidden='')
+	script.
+		var bar = document.getElementById('js-progressbar');
+		UIkit.upload('.js-upload', {
+		url: '',
+		multiple: true,
+		type: 'multipart/form-data',
+		beforeSend: function () {
+		console.log('beforeSend', arguments);
+		},
+		beforeAll: function () {
+		console.log('beforeAll', arguments);
+		},
+		load: function () {
+		console.log('load', arguments);
+		},
+		error: function () {
+		console.log('error', arguments);
+		},
+		complete: function () {
+		console.log('complete', arguments);
+		},
+		loadStart: function (e) {
+		console.log('loadStart', arguments);
+		bar.removeAttribute('hidden');
+		bar.max = e.total;
+		bar.value = e.loaded;
+		},
+		progress: function (e) {
+		console.log('progress', arguments);
+		bar.max = e.total;
+		bar.value = e.loaded;
+		},
+		loadEnd: function (e) {
+		console.log('loadEnd', arguments);
+		bar.max = e.total;
+		bar.value = e.loaded;
+		},
+		completeAll: function () {
+		console.log('completeAll', arguments);
+		setTimeout(function () {
+		bar.setAttribute('hidden', 'hidden');
+		}, 1000);
+		alert('Upload Completed');
+		}
+		});
