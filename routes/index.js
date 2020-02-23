@@ -4,6 +4,7 @@ var multer = require('multer');
 var path = require('path');
 var fs = require('fs');
 var rl = require('readline');
+var zip = require('express-zip');
 
 // SET STORAGE
 var storage = multer.diskStorage({
@@ -50,9 +51,8 @@ var upload = multer({ storage: storage })
 router.get('/', function(req, res, next) {
 	var list = files.filter( onlyUnique );
 	var code;
-	if( list.length > 0 )
-		{
-			var rows = list.map( function(value) {
+	if( list.length > 0 ) {
+		var rows = list.map( function(value) {
 			var name = value.substring(value.lastIndexOf('/') + 1);
 			var ext = value.substring(value.indexOf('.') + 1) == value ? 'null' : value.substring(value.indexOf('.') + 1);
 			var icon = 'file';
@@ -62,11 +62,14 @@ router.get('/', function(req, res, next) {
 			if( ext.match('pdf') ) icon = 'file-pdf' ;
 			return formRow(icon, name, value);
 		});
-		code = "<table class=\"uk-table uk-table-divider\">";
+		code = '<table class="uk-table uk-table-divider">\
+		<tr><td></td><td></td><td>\
+		<form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download All <span uk-icon="download"></button></form>\
+		</td></tr>';
 		rows.forEach(function(value){
 			code += "\n" + value;
 		});
-		code += "</table>"
+		code += '</table>'
 	}
 	else {
 		code = '<table class="uk-table uk-table-divider">\
@@ -92,6 +95,18 @@ router.post('/', upload.array('files[]'), (req, res) => {
 
 router.post('/download', (req, res) => {
 	res.download(req.body.file);
+});
+
+router.get('/download', (req, res) => {
+	var list = files.filter( onlyUnique );
+	var filesJSON = list.map( function(value) {
+		var name = value.substring(value.lastIndexOf('/') + 1);
+		return { 
+			'path': value,
+			'name': name,
+		}
+	});
+	res.zip(filesJSON);
 });
 
 module.exports = router;
