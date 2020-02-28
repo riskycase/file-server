@@ -89,8 +89,7 @@ router.post('/', upload.array('files[]'), (req, res) => {
 		error.httpStatusCode = 400
 		return next(error)
 	}
- 
-		res.send(files)
+	res.send(files)
 });
 
 router.post('/download', (req, res) => {
