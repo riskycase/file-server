@@ -4,7 +4,6 @@ var multer = require('multer');
 var path = require('path');
 var fs = require('fs');
 var rl = require('readline');
-var zip = require('express-zip');
 
 // SET STORAGE
 var storage = multer.diskStorage({
@@ -39,7 +38,7 @@ function onlyUnique(value, index, self) {
 
 function formRow(icon, name, link) {
 	return '<tr>\
-	<td><span uk-icon="'+icon+'"></span></td>\
+	<td style="witdh: 25;"><span uk-icon="'+icon+'"></span></td>\
 	<td>'+name+'</td>\
 	<td><form action="/download" method="POST"><button type="submit" name="file" value="'+link+'"class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download <span uk-icon="download"></button></form></td>\
 	</tr>';
@@ -53,13 +52,20 @@ router.get('/', function(req, res, next) {
 	var code;
 	if( list.length > 0 ) {
 		var rows = list.map( function(value) {
-			var name = value.substring(value.lastIndexOf('/') + 1);
-			var ext = value.substring(value.indexOf('.') + 1) == value ? 'null' : value.substring(value.indexOf('.') + 1);
-			var icon = 'file';
-			if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
-			if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
-			if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
-			if( ext.match('pdf') ) icon = 'file-pdf' ;
+			var name, icon;
+			if ( value.lastIndexOf('/')+1 === value.length ) {
+				name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
+				icon = 'folder';
+			}
+			else {
+				name = value.substring(value.lastIndexOf('/') + 1);
+				var ext = value.substring(value.indexOf('.') + 1) == value ? 'null' : value.substring(value.indexOf('.') + 1);
+				icon = 'file';
+				if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
+				if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
+				if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
+				if( ext.match('pdf') ) icon = 'file-pdf' ;
+			}
 			return formRow(icon, name, value);
 		});
 		code = '<table class="uk-table uk-table-divider">\
@@ -92,20 +98,41 @@ router.post('/', upload.array('files[]'), (req, res) => {
 	res.send(files)
 });
 
+/* Download single file */
 router.post('/download', (req, res) => {
-	res.download(req.body.file);
+	var value = req.body.file;
+	if ( value.lastIndexOf('/')+1 === value.length ) {
+		var name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
+		var namezip = name + '.zip';
+		res.zip({
+			'files':[
+				{ 'path': value, 'name': name }
+			],
+			'filename' : namezip
+		});
+	}
+	else {
+		res.download(value);
+	}
 });
 
+/* Download all files */
 router.get('/download', (req, res) => {
 	var list = files.filter( onlyUnique );
 	var filesJSON = list.map( function(value) {
-		var name = value.substring(value.lastIndexOf('/') + 1);
+		if ( value.lastIndexOf('/')+1 === value.length )
+			var name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
+		else
+			var name = value.substring(value.lastIndexOf('/') + 1);
 		return { 
 			'path': value,
 			'name': name,
 		}
 	});
-	res.zip(filesJSON);
+	res.zip({
+		'files': filesJSON,
+		'filename': 'allFiles.zip'
+	});
 });
 
 module.exports = router;
