@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var multer = require('multer');
-var path = require('path');
 var fs = require('fs');
 var rl = require('readline');
 
@@ -47,7 +46,7 @@ function formRow(icon, name, link) {
 var upload = multer({ storage: storage })
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
 	var list = files.filter( onlyUnique );
 	var code;
 	if( list.length > 0 ) {
