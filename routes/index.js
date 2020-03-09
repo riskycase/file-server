@@ -7,10 +7,10 @@ var rl = require('readline');
 // SET STORAGE
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, 'uploads')
+		cb(null, 'uploads');
 	},
 	filename: function (req, file, cb) {
-		cb(null, file.originalname)
+		cb(null, file.originalname);
 	}
 });
 
@@ -43,7 +43,7 @@ function formRow(icon, name, link) {
 	</tr>';
 }
 
-var upload = multer({ storage: storage })
+var upload = multer({ storage: storage });
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -74,7 +74,7 @@ router.get('/', function(req, res) {
 		rows.forEach(function(value){
 			code += "\n" + value;
 		});
-		code += '</table>'
+		code += '</table>';
 	}
 	else {
 		code = '<table class="uk-table uk-table-divider">\
@@ -88,13 +88,13 @@ router.get('/', function(req, res) {
 
 /* POST home page. */
 router.post('/', upload.array('files[]'), (req, res) => {
-	const files = req.files
+	const files = req.files;
 	if (!files) {
-		const error = new Error('Please choose files')
-		error.httpStatusCode = 400
-		return next(error)
+		const error = new Error('Please choose files');
+		error.httpStatusCode = 400;
+		return next(error);
 	}
-	res.send(files)
+	res.send(files);
 });
 
 /* Download single file */
@@ -126,7 +126,7 @@ router.get('/download', (req, res) => {
 		return { 
 			'path': value,
 			'name': name,
-		}
+		};
 	});
 	res.zip({
 		'files': filesJSON,
