@@ -1,0 +1,19 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 11,
+        "sourceType": "script",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "rules": {
+        "semi": "error",
+		"no-console": "error",
+		"no-unexpected-multiline": "error",
+		"no-constant-condition": "error"
+    },
+    "env": {
+        "browser": true,
+        "node": true
+    }
+}
