@@ -1,101 +1,102 @@
 <!DOCTYPE html>
-
-<head>
-	<!-- Required meta tags-->
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<!-- UIkit CSS-->
-	<link rel="stylesheet" href="./stylesheets/uikit.css">
-	<!-- UIkit JS-->
-	<script src="./scripts/uikit.js"></script>
-	<script src="./scripts/uikit-icons.js"></script>
-	<title>File Server</title>
-	<style>
-		@font-face {
-			font-family: 'Source Sans Pro';
-			src: local('SourceSansPro'), url('fonts/SourceSansPro-Regular.ttf') format('truetype');
-		}
-
-		body {
-			font-family: 'Source Sans Pro';
-		}
-	</style>
-</head>
-
-<body>
-	<header>
-		<div uk-sticky="animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky uk-navbar-transparent; cls-inactive: uk-navbar-transparent uk-light; top: 200">
-			<nav class="uk-navbar-container uk-background-secondary uk-padding-small" uk-navbar="">
-				<div class="uk-navbar-center">
-					<div class="uk-navbar-logo">File Server</div>
-				</div>
-			</nav>
-		</div>
-	</header>
-	<div class="uk-navbar-item">
-		<ul class="uk-tab-bottom" uk-tab="animation: uk-animation-slide-bottom, uk-animation-slide-top; connect: .main" uk-switcher="">
-			<li class="uk-active"><a href="#">Recieve</a></li>
-			<li><a href="#">Send</a></li>
-		</ul>
-	</div>
-	<ul class="uk-switcher main uk-align-center uk-width-1-1">
-		<li>
-			<div id="downloadList">
-				<%- code%>
-			</div>
-		</li>
-		<li>
-			<div class="js-upload uk-placeholder uk-text-center" id="uploadArea">
-				<span uk-icon="icon: cloud-upload"></span><span class="uk-text-middle">Send files by dropping them here or </span>
-				<div uk-form-custom=""><input type="file" multiple=""><span class="uk-link">selecting them</span></div>
-			</div>
-			<progress class="uk-progress" id="js-progressbar" value="0" max="100" hidden=""></progress>
-		</li>
-	</ul>
-	<script>
-		var bar = document.getElementById('js-progressbar');
-		UIkit.upload('.js-upload', {
-			url: '',
-			multiple: true,
-			type: 'multipart/form-data',
-			beforeSend: function() {
-				console.log('beforeSend', arguments);
-			},
-			beforeAll: function() {
-				console.log('beforeAll', arguments);
-			},
-			load: function() {
-				console.log('load', arguments);
-			},
-			error: function() {
-				console.log('error', arguments);
-			},
-			complete: function() {
-				console.log('complete', arguments);
-			},
-			loadStart: function(e) {
-				console.log('loadStart', arguments);
-				bar.removeAttribute('hidden');
-				bar.max = e.total;
-				bar.value = e.loaded;
-			},
-			progress: function(e) {
-				console.log('progress', arguments);
-				bar.max = e.total;
-				bar.value = e.loaded;
-			},
-			loadEnd: function(e) {
-				console.log('loadEnd', arguments);
-				bar.max = e.total;
-				bar.value = e.loaded;
-			},
-			completeAll: function() {
-				console.log('completeAll', arguments);
-				setTimeout(function() {
-					bar.setAttribute('hidden', 'hidden');
-				}, 1000);
-				alert('Upload Completed');
+<html>
+	<head>
+		<!-- Required meta tags-->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<!-- UIkit CSS-->
+		<link rel="stylesheet" href="./stylesheets/uikit.css">
+		<!-- UIkit JS-->
+		<script src="./scripts/uikit.js"></script>
+		<script src="./scripts/uikit-icons.js"></script>
+		<title>File Server</title>
+		<style>
+			@font-face {
+				font-family: 'Source Sans Pro';
+				src: local('SourceSansPro'), url('fonts/SourceSansPro-Regular.ttf') format('truetype');
 			}
-		});
-	</script>
-</body>
+
+			body {
+				font-family: 'Source Sans Pro';
+			}
+		</style>
+	</head>
+
+	<body>
+		<header>
+			<div uk-sticky="animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky uk-navbar-transparent; cls-inactive: uk-navbar-transparent uk-light; top: 200">
+				<nav class="uk-navbar-container uk-background-secondary uk-padding-small" uk-navbar="">
+					<div class="uk-navbar-center">
+						<div class="uk-navbar-logo">File Server</div>
+					</div>
+				</nav>
+			</div>
+		</header>
+		<div class="uk-navbar-item">
+			<ul class="uk-tab-bottom" uk-tab="animation: uk-animation-slide-bottom, uk-animation-slide-top; connect: .main" uk-switcher="">
+				<li class="uk-active"><a href="#">Recieve</a></li>
+				<li><a href="#">Send</a></li>
+			</ul>
+		</div>
+		<ul class="uk-switcher main uk-align-center uk-width-1-1">
+			<li>
+				<div id="downloadList">
+					<%- code%>
+				</div>
+			</li>
+			<li>
+				<div class="js-upload uk-placeholder uk-text-center" id="uploadArea">
+					<span uk-icon="icon: cloud-upload"></span><span class="uk-text-middle">Send files by dropping them here or </span>
+					<div uk-form-custom=""><input type="file" multiple=""><span class="uk-link">selecting them</span></div>
+				</div>
+				<progress class="uk-progress" id="js-progressbar" value="0" max="100" hidden=""></progress>
+			</li>
+		</ul>
+		<script>
+			var bar = document.getElementById('js-progressbar');
+			UIkit.upload('.js-upload', {
+				url: '',
+				multiple: true,
+				type: 'multipart/form-data',
+				beforeSend: function() {
+					console.log('beforeSend', arguments);
+				},
+				beforeAll: function() {
+					console.log('beforeAll', arguments);
+				},
+				load: function() {
+					console.log('load', arguments);
+				},
+				error: function() {
+					console.log('error', arguments);
+				},
+				complete: function() {
+					console.log('complete', arguments);
+				},
+				loadStart: function(e) {
+					console.log('loadStart', arguments);
+					bar.removeAttribute('hidden');
+					bar.max = e.total;
+					bar.value = e.loaded;
+				},
+				progress: function(e) {
+					console.log('progress', arguments);
+					bar.max = e.total;
+					bar.value = e.loaded;
+				},
+				loadEnd: function(e) {
+					console.log('loadEnd', arguments);
+					bar.max = e.total;
+					bar.value = e.loaded;
+				},
+				completeAll: function() {
+					console.log('completeAll', arguments);
+					setTimeout(function() {
+						bar.setAttribute('hidden', 'hidden');
+					}, 1000);
+					alert('Upload Completed');
+				}
+			});
+		</script>
+	</body>
+</html>
