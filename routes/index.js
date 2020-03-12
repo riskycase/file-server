@@ -37,10 +37,10 @@ function onlyUnique(value, index, self) {
 
 function formRow(icon, name, link) {
 	return '<tr>\
-	<td style="witdh: 25;"><span uk-icon="'+icon+'"></span></td>\
-	<td>'+name+'</td>\
-	<td><form action="/download" method="POST"><button type="submit" name="file" value="'+link+'"class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download <span uk-icon="download"></button></form></td>\
-	</tr>';
+	<td style="witdh: 25px; padding: 5px"><span uk-icon="'+icon+'"></span> '+name+'</td>\
+	<td style="width: 155px">\
+	<div style="width: 210px"><form action="/download" method="POST" style="width: 100%"><button type="submit" name="file" value="'+link+'"class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download <span uk-icon="download"></button></form></div>\
+	</td></tr>';
 }
 
 var upload = multer({ storage: storage });
@@ -48,8 +48,9 @@ var upload = multer({ storage: storage });
 /* GET home page. */
 router.get('/', function(req, res) {
 	var list = files.filter( onlyUnique );
-	var code;
+	var code = '<table class="uk-table uk-table-divider">';
 	if( list.length > 0 ) {
+		code += '<tr><td></td><td style="width: 210px"><form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0; width: 210px">Download All <span uk-icon="download"></button></form></td></tr>\n';
 		var rows = list.map( function(value) {
 			var name, icon;
 			if ( value.lastIndexOf('/')+1 === value.length ) {
@@ -77,8 +78,7 @@ router.get('/', function(req, res) {
 		code += '</table>';
 	}
 	else {
-		code = '<table class="uk-table uk-table-divider">\
-		<tr><td>\
+		code += '<tr><td>\
 		No files selected to share\
 		</td></tr>\
 		</table>';
