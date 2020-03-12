@@ -2,3 +2,5 @@ plugins:
   eslint:
     enabled: true
     channel: "eslint-6"
+exclude_patterns:
+  - "public/"
