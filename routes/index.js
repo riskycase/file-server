@@ -50,7 +50,7 @@ router.get('/', function(req, res) {
 	var list = files.filter( onlyUnique );
 	var code = '<table class="uk-table uk-table-divider">';
 	if( list.length > 0 ) {
-		code += '<tr><td></td><td style="width: 210px"><form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0; width: 210px">Download All <span uk-icon="download"></button></form></td></tr>\n';
+		code += '<tr><td colspan=2 style="width: 210px"><form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0; width: 210px">Download All <span uk-icon="download"></button></form></td></tr>\n';
 		var rows = list.map( function(value) {
 			var name, icon;
 			if ( value.lastIndexOf('/')+1 === value.length ) {
@@ -68,10 +68,6 @@ router.get('/', function(req, res) {
 			}
 			return formRow(icon, name, value);
 		});
-		code = '<table class="uk-table uk-table-divider">\
-		<tr><td></td><td></td><td>\
-		<form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download All <span uk-icon="download"></button></form>\
-		</td></tr>';
 		rows.forEach(function(value){
 			code += "\n" + value;
 		});
