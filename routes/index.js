@@ -3,6 +3,7 @@ var router = express.Router();
 var multer = require('multer');
 var fs = require('fs');
 var rl = require('readline');
+var nfu = require('nodejs-fs-utils');
 
 // SET STORAGE
 var storage = multer.diskStorage({
@@ -30,17 +31,27 @@ for (index in myArgs) {
 	});
 }
 
-/* Get unique elements only */
-function onlyUnique(value, index, self) { 
-    return self.indexOf(value) === index;
+/* Convert file size to human readable */
+function humanFileSize(bytes, si) {
+	var thresh = si ? 1000 : 1024;
+	if(Math.abs(bytes) < thresh) {
+		return bytes + ' B';
+	}
+	var units = si
+		? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+		: ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+	var u = -1;
+	do {
+		bytes /= thresh;
+		++u;
+	}while(Math.abs(bytes) >= thresh && u < units.length - 1);
+	return bytes.toFixed(0)+' '+units[u];
 }
 
-function formRow(icon, name, link) {
-	return '<tr>\
-	<td style="witdh: 25px; padding: 5px"><span uk-icon="'+icon+'"></span> '+name+'</td>\
-	<td style="width: 155px">\
-	<div style="width: 210px"><form action="/download" method="POST" style="width: 100%"><button type="submit" name="file" value="'+link+'"class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download <span uk-icon="download"></button></form></div>\
-	</td></tr>';
+
+/* Get unique elements only */
+function onlyUnique(value, index, self) { 
+	return self.indexOf(value) === index;
 }
 
 var upload = multer({ storage: storage });
@@ -48,11 +59,10 @@ var upload = multer({ storage: storage });
 /* GET home page. */
 router.get('/', function(req, res) {
 	var list = files.filter( onlyUnique );
-	var code = '<table class="uk-table uk-table-divider">';
+	var rows;
 	if( list.length > 0 ) {
-		code += '<tr><td colspan=2 style="width: 210px"><form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0; width: 210px">Download All <span uk-icon="download"></button></form></td></tr>\n';
-		var rows = list.map( function(value) {
-			var name, icon;
+		var rows = list.map( function(value, index) {
+			var name, icon, size = humanFileSize(nfu.fsizeSync(value), true);
 			if ( value.lastIndexOf('/')+1 === value.length ) {
 				name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
 				icon = 'folder';
@@ -65,21 +75,17 @@ router.get('/', function(req, res) {
 				if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
 				if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
 				if( ext.match('pdf') ) icon = 'file-pdf' ;
+				var stat = fs.statSync(value);
 			}
-			return formRow(icon, name, value);
+			return {
+				'name': name,
+				'icon': icon,
+				'size': size,
+				'index': index
+			};
 		});
-		rows.forEach(function(value){
-			code += "\n" + value;
-		});
-		code += '</table>';
 	}
-	else {
-		code += '<tr><td>\
-		No files selected to share\
-		</td></tr>\
-		</table>';
-	}
-	res.render('index', { code: code });
+	res.render('index', { rows: rows });
 });
 
 /* POST home page. */
@@ -95,7 +101,7 @@ router.post('/', upload.array('files[]'), (req, res) => {
 
 /* Download single file */
 router.post('/download', (req, res) => {
-	var value = req.body.file;
+	var value = files[req.body.file];
 	if ( value.lastIndexOf('/')+1 === value.length ) {
 		var name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
 		var namezip = name + '.zip';
