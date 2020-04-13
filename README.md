@@ -2,6 +2,13 @@
 A file server based on node.js that allows sharing on the same local network, 
 and possibly over the internet if bridging is used
 
+## Badges
+[![Build Status](https://travis-ci.com/riskycase/file-server.svg?branch=master)](https://travis-ci.com/riskycase/file-server)
+[![Depfu](https://badges.depfu.com/badges/5c7a82c495e09f6aeed06d0708f2c363/status.svg)](https://depfu.com)
+[![Depfu](https://badges.depfu.com/badges/5c7a82c495e09f6aeed06d0708f2c363/overview.svg)](https://depfu.com/github/riskycase/file-server?project_id=11774)
+[![Maintainability](https://api.codeclimate.com/v1/badges/eaa51b0988f9f1072e2d/maintainability)](https://codeclimate.com/github/riskycase/file-server/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/eaa51b0988f9f1072e2d/test_coverage)](https://codeclimate.com/github/riskycase/file-server/test_coverage)
+
 ## Setup
 
 * Make sure node.js is installed along with npm
@@ -29,5 +36,6 @@ host device
 * Retrieve the files sent from the uploads folder
 
 ## To-do
+* Add tests
 * Have custom upload destination
 * Serve different pages for mobile and desktop
