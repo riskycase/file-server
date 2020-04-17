@@ -19,7 +19,32 @@ var storage = multer.diskStorage({
 var myArgs = process.argv.slice(2);
 var files = [];
 var rows = [];
-var ready = 0;
+var index = 0;
+
+function formObject(path) {
+	var name, icon, size = humanFileSize(nfu.fsizeSync(path), true);
+	if ( path.lastIndexOf('/')+1 === path.length ) {
+		name = path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1 ) + 1, path.length - 1);
+		icon = 'folder';
+	}
+	else {
+		name = path.substring(path.lastIndexOf('/') + 1);
+		var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
+		icon = 'file';
+		if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
+		if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
+		if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
+		if( ext.match('pdf') ) icon = 'file-pdf' ;
+		var stat = fs.statSync(path);
+	}
+	return {
+		'name': name,
+		'icon': icon,
+		'icon': icon,
+		'size': size,
+		'index': index++
+	};
+}
 
 for (index in myArgs) {
 	var file = myArgs[index];
@@ -33,29 +58,8 @@ for (index in myArgs) {
 	});
 	readInterface.on('close', function() {
 		if( files.length > 0 ) {
-			rows = files.map( function(value, index) {
-				var name, icon, size = humanFileSize(nfu.fsizeSync(value), true);
-				if ( value.lastIndexOf('/')+1 === value.length ) {
-					name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
-					icon = 'folder';
-				}
-				else {
-					name = value.substring(value.lastIndexOf('/') + 1);
-					var ext = value.substring(value.indexOf('.') + 1) == value ? 'null' : value.substring(value.indexOf('.') + 1);
-					icon = 'file';
-					if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
-					if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
-					if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
-					if( ext.match('pdf') ) icon = 'file-pdf' ;
-					var stat = fs.statSync(value);
-				}
-				return {
-					'name': name,
-					'icon': icon,
-					'icon': icon,
-					'size': size,
-					'index': index
-				};
+			rows = files.map( function(value) {
+				return formObject(value);
 			});
 		}
 	});
@@ -101,28 +105,7 @@ router.post('/', upload.array('files[]'), (req, res) => {
 	}
 	files.forEach( function(value, index) {
 		var path = JSON.stringify(value.path).replace('\\\\', '/').replace(/"/g, '');
-		var name, icon, size = humanFileSize(nfu.fsizeSync(path), true);
-		if ( path.lastIndexOf('/')+1 === path.length ) {
-			name = path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1 ) + 1, path.length - 1);
-			icon = 'folder';
-		}
-		else {
-			name = path.substring(path.lastIndexOf('/') + 1);
-			var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
-			icon = 'file';
-			if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
-			if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
-			if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
-			if( ext.match('pdf') ) icon = 'file-pdf' ;
-			var stat = fs.statSync(path);
-		}
-		rows.push({
-			'name': name,
-			'icon': icon,
-			'icon': icon,
-			'size': size,
-			'index': index
-		});
+		rows.push(formObject(path));
 	});
 	res.send(files);
 });
