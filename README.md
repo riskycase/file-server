@@ -38,4 +38,3 @@ host device
 ## To-do
 * Add tests
 * Have custom upload destination
-* Serve different pages for mobile and desktop
