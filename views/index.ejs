@@ -41,18 +41,44 @@
 		<ul class="uk-switcher main uk-align-center uk-width-1-1">
 			<li>
 				<div id="downloadList">
-				<table class="uk-table uk-table-divider">
-					<% if (rows) {%>
-						<tr><td colspan=2 style="width: 210px"><form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0; width: 210px">Download All <span uk-icon="download"></button></form></td></tr>
-						<% rows.forEach(function(row){%>
-							<td style="witdh: 25px; padding: 5px"><span uk-icon="<%- row.icon %>"></span>   <%- row.name %> (<%- row.size %>)</td>
-							<td style="width: 155px"><div style="width: 210px"><form action="/download" method="POST" style="width: 100%"><button type="submit" name="file" value="<%- row.index %>" class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download <span uk-icon="download"></button></form></div>
-							</td></tr>
-						<% }) %>
-					<% } else { %>
-						<tr><td>No files selected to share</td></tr>
-					<% } %>
-				</table>
+					<table class="uk-table uk-table-divider uk-visible@m">
+						<% if (rows) {%>
+							<tr><td colspan=2 style="width: 210px"><form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0; width: 210px" id="download-all">Download All <span uk-icon="download"></button></form></td></tr>
+							<% rows.forEach(function(row){%>
+								<td style="witdh: 25px; padding: 5px"></span>   <%- row.name %> (<%- row.size %>)</td>
+								<td style="width: 155px"><div style="width: 210px"><form action="/download" method="POST" style="width: 100%"><button type="submit" name="file" value="<%- row.index %>" id="<%- row.index %>" class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download <span uk-icon="download"></button></form></div>
+								</td></tr>
+							<% }) %>
+						<% } else { %>
+							<tr><td>No files selected to share</td></tr>
+						<% } %>
+					</table>
+					<div class="uk-hidden@m uk-padding-small">
+						<% if (rows) {%>
+							<form action="/download" method="GET" id="download-all"></form>
+							<div class="uk-card uk-card-primary uk-padding-small uk-flex uk-width-expand uk-margin-small" onclick="clickOn('download-all')">
+								<div class="">
+									<span uk-icon="icon: download">
+								</div class="uk-margin-small-left">
+								<div>Download All</div>
+							</div>
+							<% rows.forEach(function(row){%>
+								<div class="uk-card uk-card-primary uk-padding-small uk-flex uk-width-expand uk-margin-small" onclick="clickOn('<%- row.index %>')">
+									<div class="">
+										<span uk-icon="icon: <%- row.icon %>; ratio: 2">
+									</div>
+									<div class="uk-margin-small-left">
+										<div><%- row.name %></div>
+										<div>(<%- row.size %>)</div>									
+									</div>
+								</div>
+							<% }) %>
+						<% } else { %>
+							<div class="uk-alert-primary uk-align-center" uk-alert>
+								No files selected to share
+							</div>
+						<% } %>
+					</div>
 				</div>
 			</li>
 			<li>
@@ -64,6 +90,11 @@
 			</li>
 		</ul>
 		<script>
+			
+			function clickOn(x) {
+				document.getElementById(x).click();
+			}
+		
 			var bar = document.getElementById('js-progressbar');
 			UIkit.upload('.js-upload', {
 				url: '',
