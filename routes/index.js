@@ -18,6 +18,8 @@ var storage = multer.diskStorage({
 // Get args
 var myArgs = process.argv.slice(2);
 var files = [];
+var rows = [];
+var ready = 0;
 
 for (index in myArgs) {
 	var file = myArgs[index];
@@ -27,7 +29,35 @@ for (index in myArgs) {
 		console: false
 	});
 	readInterface.on('line', function(line) {
-		files.push(line);
+		if( files.indexOf(line) === -1 ) files.push(line);
+	});
+	readInterface.on('close', function() {
+		if( files.length > 0 ) {
+			rows = files.map( function(value, index) {
+				var name, icon, size = humanFileSize(nfu.fsizeSync(value), true);
+				if ( value.lastIndexOf('/')+1 === value.length ) {
+					name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
+					icon = 'folder';
+				}
+				else {
+					name = value.substring(value.lastIndexOf('/') + 1);
+					var ext = value.substring(value.indexOf('.') + 1) == value ? 'null' : value.substring(value.indexOf('.') + 1);
+					icon = 'file';
+					if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
+					if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
+					if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
+					if( ext.match('pdf') ) icon = 'file-pdf' ;
+					var stat = fs.statSync(value);
+				}
+				return {
+					'name': name,
+					'icon': icon,
+					'icon': icon,
+					'size': size,
+					'index': index
+				};
+			});
+		}
 	});
 }
 
@@ -58,34 +88,7 @@ var upload = multer({ storage: storage });
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	var list = files.filter( onlyUnique );
-	var rows;
-	if( list.length > 0 ) {
-		var rows = list.map( function(value, index) {
-			var name, icon, size = humanFileSize(nfu.fsizeSync(value), true);
-			if ( value.lastIndexOf('/')+1 === value.length ) {
-				name = value.substring(value.lastIndexOf('/', value.lastIndexOf('/') - 1 ) + 1, value.length - 1);
-				icon = 'folder';
-			}
-			else {
-				name = value.substring(value.lastIndexOf('/') + 1);
-				var ext = value.substring(value.indexOf('.') + 1) == value ? 'null' : value.substring(value.indexOf('.') + 1);
-				icon = 'file';
-				if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
-				if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
-				if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
-				if( ext.match('pdf') ) icon = 'file-pdf' ;
-				var stat = fs.statSync(value);
-			}
-			return {
-				'name': name,
-				'icon': icon,
-				'size': size,
-				'index': index
-			};
-		});
-	}
-	res.render('index', { rows: rows });
+	res.render('index', { rows : rows });
 });
 
 /* POST home page. */
