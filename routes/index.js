@@ -99,6 +99,31 @@ router.post('/', upload.array('files[]'), (req, res) => {
 		error.httpStatusCode = 400;
 		return next(error);
 	}
+	files.forEach( function(value, index) {
+		var path = JSON.stringify(value.path).replace('\\\\', '/').replace(/"/g, '');
+		var name, icon, size = humanFileSize(nfu.fsizeSync(path), true);
+		if ( path.lastIndexOf('/')+1 === path.length ) {
+			name = path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1 ) + 1, path.length - 1);
+			icon = 'folder';
+		}
+		else {
+			name = path.substring(path.lastIndexOf('/') + 1);
+			var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
+			icon = 'file';
+			if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
+			if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
+			if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
+			if( ext.match('pdf') ) icon = 'file-pdf' ;
+			var stat = fs.statSync(path);
+		}
+		rows.push({
+			'name': name,
+			'icon': icon,
+			'icon': icon,
+			'size': size,
+			'index': index
+		});
+	});
 	res.send(files);
 });
 
