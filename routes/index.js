@@ -21,29 +21,30 @@ var files = [];
 var rows = [];
 var index = 0;
 
+// Form the row object that will be inserted into the view
 function formObject(path) {
-	var name, icon, size = humanFileSize(nfu.fsizeSync(path), true);
-	if ( path.lastIndexOf('/')+1 === path.length ) {
-		name = path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1 ) + 1, path.length - 1);
-		icon = 'folder';
-	}
-	else {
-		name = path.substring(path.lastIndexOf('/') + 1);
-		var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
-		icon = 'file';
-		if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon = 'image' ;
-		if( ext.match('mp3|ogg|avi|mp4|flac') ) icon = 'play' ;
-		if( ext.match('txt|doc|docx') ) icon = 'file-text' ;
-		if( ext.match('pdf') ) icon = 'file-pdf' ;
-		var stat = fs.statSync(path);
-	}
 	return {
-		'name': name,
-		'icon': icon,
-		'icon': icon,
-		'size': size,
+		'name': nameOf(path),
+		'icon': getIcon(path),
+		'size': humanFileSize(nfu.fsizeSync(path), true),
 		'index': index++
 	};
+}
+
+// Get the name of the file/folder from the path
+function nameOf(path) {
+	return (path.lastIndexOf('/')+1 === path.length) ? path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1 ) + 1, path.length - 1) : name = path.substring(path.lastIndexOf('/') + 1);
+}
+
+// Get the icon of the file/folder given path
+function getIcon(path) {
+	if ( path.lastIndexOf('/')+1 === path.length ) return 'folder';
+	var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
+	if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) return 'image' ;
+	if( ext.match('mp3|ogg|avi|mp4|flac') ) return 'play' ;
+	if( ext.match('txt|doc|docx') ) return 'file-text' ;
+	if( ext.match('pdf') ) return 'file-pdf' ;
+	return 'file';
 }
 
 for (index in myArgs) {
