@@ -4,21 +4,23 @@ var multer = require('multer');
 var fs = require('fs');
 var rl = require('readline');
 var nfu = require('nodejs-fs-utils');
+var parseArgs = require('minimist')
 
-// SET STORAGE
-var storage = multer.diskStorage({
-	destination: function (req, file, cb) {
-		cb(null, 'uploads');
-	},
-	filename: function (req, file, cb) {
-		cb(null, file.originalname);
-	}
-});
 
 // Get args
-var myArgs = process.argv.slice(2);
+var argv = parseArgs(process.argv.slice(2), opts={
+	string: ['dest', 'list'],
+	alias: {
+		d: 'dest',
+		l: 'list'
+	},
+	default: {
+		d: 'uploads',
+		f: undefined
+	}
+});
 var files = [];
-var rows = [];
+var rows;
 var index = 0;
 
 // Form the row object that will be inserted into the view
@@ -48,10 +50,20 @@ function getIcon(path) {
 	return icon;
 }
 
-for (index in myArgs) {
-	var file = myArgs[index];
+// SET STORAGE
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, argv.d);
+	},
+	filename: function (req, file, cb) {
+		cb(null, file.originalname);
+	}
+});
+
+//Read from list of files
+if(argv.list) {
 	var readInterface = rl.createInterface({
-		input: fs.createReadStream(file),
+		input: fs.createReadStream(argv.list),
 		output: process.stdout,
 		console: false
 	});
@@ -94,7 +106,7 @@ var upload = multer({ storage: storage });
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	res.render('index', { rows : rows });
+	res.render('index', { lines : rows });
 });
 
 /* POST home page. */
@@ -105,6 +117,7 @@ router.post('/', upload.array('files[]'), (req, res) => {
 		error.httpStatusCode = 400;
 		return next(error);
 	}
+	if(!rows) rows = [];
 	files.forEach( function(value, index) {
 		var path = JSON.stringify(value.path).replace('\\\\', '/').replace(/"/g, '');
 		rows.push(formObject(path));

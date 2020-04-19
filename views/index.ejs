@@ -42,9 +42,9 @@
 			<li>
 				<div id="downloadList">
 					<table class="uk-table uk-table-divider uk-visible@m">
-						<% if (rows) {%>
+						<% if (lines) {%>
 							<tr><td colspan=2 style="width: 210px"><form action="/download" method="GET"><button type="submit" class="uk-button uk-button-primary uk-align-right" style="margin: 0; width: 210px" id="download-all">Download All <span uk-icon="download"></button></form></td></tr>
-							<% rows.forEach(function(row){%>
+							<% lines.forEach(function(row){%>
 								<td style="witdh: 25px; padding: 5px"><span uk-icon="icon: <%- row.icon %>;"></span>   <%- row.name %> (<%- row.size %>)</td>
 								<td style="width: 155px"><div style="width: 210px"><form action="/download" method="POST" style="width: 100%"><button type="submit" name="file" value="<%- row.index %>" id="<%- row.index %>" class="uk-button uk-button-primary uk-align-right" style="margin: 0;">Download <span uk-icon="download"></button></form></div>
 								</td></tr>
@@ -54,7 +54,7 @@
 						<% } %>
 					</table>
 					<div class="uk-hidden@m uk-padding-small">
-						<% if (rows) {%>
+						<% if (lines) {%>
 							<form action="/download" method="GET" id="download-all"></form>
 							<div class="uk-card uk-card-primary uk-padding-small uk-flex uk-width-expand uk-margin-small" onclick="clickOn('download-all')">
 								<div class="">
@@ -62,7 +62,7 @@
 								</div class="uk-margin-small-left">
 								<div>Download All</div>
 							</div>
-							<% rows.forEach(function(row){%>
+							<% lines.forEach(function(row){%>
 								<div class="uk-card uk-card-primary uk-padding-small uk-flex uk-width-expand uk-margin-small" onclick="clickOn('<%- row.index %>')">
 									<div class="">
 										<span uk-icon="icon: <%- row.icon %>; ratio: 2"></span>
