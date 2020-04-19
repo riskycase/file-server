@@ -38,13 +38,14 @@ function nameOf(path) {
 
 // Get the icon of the file/folder given path
 function getIcon(path) {
-	if ( path.lastIndexOf('/')+1 === path.length ) return 'folder';
+	var icon = 'file';
+	if ( path.lastIndexOf('/')+1 === path.length ) icon =  'folder';
 	var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
-	if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) return 'image' ;
-	if( ext.match('mp3|ogg|avi|mp4|flac') ) return 'play' ;
-	if( ext.match('txt|doc|docx') ) return 'file-text' ;
-	if( ext.match('pdf') ) return 'file-pdf' ;
-	return 'file';
+	if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon =  'image' ;
+	else if( ext.match('mp3|ogg|avi|mp4|flac') ) icon =  'play' ;
+	else if( ext.match('txt|doc|docx') ) icon =  'file-text' ;
+	else if( ext.match('pdf') ) icon =  'file-pdf' ;
+	return icon;
 }
 
 for (index in myArgs) {
