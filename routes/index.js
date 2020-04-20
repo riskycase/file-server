@@ -120,7 +120,8 @@ var upload = multer({ storage: storage });
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	res.render('index', { lines : rows });
+	if(rows.length > 0) res.render('index', { lines : rows });
+	else res.render('index', { lines : undefined });
 });
 
 /* POST home page. */
