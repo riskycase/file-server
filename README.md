@@ -25,9 +25,9 @@ your own fork
 ## Usage
 * Create a text file which has the paths of the files you want to host on the 
 server, each path seperated by a newline
-* Enter `npm start [-l path] [-d| upload_path]` into the terminal where path is
- the path to the above text file and upload_path is where the files will be 
- uploaded to (if not defined it will be the uploads folder in the app)
+* Enter `npm start [-l file_path] [-d upload_path]` into the terminal where 
+file_path is the path to the above text file and upload_path is where the files
+ will be uploaded to (if not defined it will be the uploads folder in the app)
 * Get the IP address of the current device (which is host) on the local network
 (let us assume it to be `192.168.1.2`)
 * On another device present on the same network, open the following link:
