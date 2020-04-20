@@ -4,23 +4,37 @@ var multer = require('multer');
 var fs = require('fs');
 var rl = require('readline');
 var nfu = require('nodejs-fs-utils');
-var parseArgs = require('minimist')
-
+var meow = require('meow');
 
 // Get args
-var argv = parseArgs(process.argv.slice(2), opts={
-	string: ['dest', 'list'],
-	alias: {
-		d: 'dest',
-		l: 'list'
-	},
-	default: {
-		d: 'uploads',
-		f: undefined
+var cli = meow(`
+	Usage
+	  $ npm start [options] [files]
+	  files is an array of paths to files you want to share
+
+	Options
+	  --destination, -d	PATH	Save uploaded files to folder specified in path (defaults to uploads folder in local working directory)
+	  --list, -l		PATH	Read files to share from the lsit given in path
+
+	Examples
+	  $ npm start 
+`, {
+	booleanDefault: undefined,
+	flags: {
+		destination: {
+			type: 'string',
+			default: 'uploads',
+			alias: 'd'
+		},
+		list: {
+			type: 'string',
+			default: '',
+			alias: 'l'
+		}
 	}
 });
-var files = [];
-var rows;
+var files = cli.input.map(value => value.replace(/\\/g, '/'));
+var rows = files.map(formObject);
 var index = 0;
 
 // Form the row object that will be inserted into the view
@@ -53,7 +67,7 @@ function getIcon(path) {
 // SET STORAGE
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, argv.d);
+		cb(null, cli.flags.destination);
 	},
 	filename: function (req, file, cb) {
 		cb(null, file.originalname);
@@ -61,9 +75,9 @@ var storage = multer.diskStorage({
 });
 
 //Read from list of files
-if(argv.list) {
+if(cli.flags.list !== '') {
 	var readInterface = rl.createInterface({
-		input: fs.createReadStream(argv.list),
+		input: fs.createReadStream(cli.flags.list),
 		output: process.stdout,
 		console: false
 	});
