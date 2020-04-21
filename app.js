@@ -1,4 +1,5 @@
 module.exports = function(cli){
+	
 	var createError = require('http-errors');
 	var express = require('express');
 	var path = require('path');
@@ -7,6 +8,7 @@ module.exports = function(cli){
 	var zip = require('express-easy-zip');
 
 	var indexRouter = require('./routes/index')(cli);
+	var downloadRouter = require('./routes/download');
 
 	var app = express();
 
@@ -23,6 +25,7 @@ module.exports = function(cli){
 	app.use(express.static(path.join(__dirname, 'public')));
 
 	app.use('/', indexRouter);
+	app.use('/download', downloadRouter);
 
 	// catch 404 and forward to error handler
 	app.use(function(req, res, next) {
