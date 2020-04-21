@@ -7,9 +7,17 @@ var files = [];
 var rows = [];
 var index = 0;
 var destination;
+var icons = [
+	['image','jpg|jpeg|png|dng|bmp|tiff'],
+	['play','mp3|ogg|avi|mp4|flac'],
+	['file-text','txt|doc|docx'],
+	['pdf','pdf'],
+	['file','']
+];
 
 // Form the row object that will be inserted into the view
 function formObject(path) {
+	path = path.replace(/\\/g, '/');
 	return {
 		'name': nameOf(path),
 		'icon': getIcon(path),
@@ -20,18 +28,17 @@ function formObject(path) {
 
 // Get the name of the file/folder from the path
 function nameOf(path) {
-	return (path.lastIndexOf('/')+1 === path.length) ? path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1 ) + 1, path.length - 1) : name = path.substring(path.lastIndexOf('/') + 1);
+	if ( path.lastIndexOf('/') === path.length - 1 ) path = path.substring(0, path.length - 1 );
+	return path.substring(path.lastIndexOf('/') + 1).replace('/','') ;
 }
 
 // Get the icon of the file/folder given path
 function getIcon(path) {
-	var icon = 'file';
-	if ( path.lastIndexOf('/')+1 === path.length ) icon =  'folder';
 	var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
-	if( ext.match('jpg|jpeg|png|dng|bmp|tiff') ) icon =  'image' ;
-	else if( ext.match('mp3|ogg|avi|mp4|flac') ) icon =  'play' ;
-	else if( ext.match('txt|doc|docx') ) icon =  'file-text' ;
-	else if( ext.match('pdf') ) icon =  'file-pdf' ;
+	var icon = icons.find(function(value) {
+		return ext.match(value[1]);
+	})[0];
+	if ( fs.existsSync(path) && fs.lstatSync(path).isDirectory() ) icon =  'folder';
 	return icon;
 }
 
@@ -76,6 +83,8 @@ module.exports.init = function(cli) {
 	rows = files.map(formObject);
 	destination = cli.flags.destination;
 	
+	if(!fs.existsSync(destination)) fs.mkdirSync(destination);
+	
 	//Read from list of files
 	if(cli.flags.list !== '') {
 		var readInterface = rl.createInterface({
@@ -91,15 +100,15 @@ module.exports.init = function(cli) {
 		});
 	}
 
-}
+};
 
 module.exports.getRows = function() {
 	return rows;
-}
+};
 
 module.exports.getPaths = function() {
 	return files;
-}
+};
 
 module.exports.saveFiles = upload.array('files[]');
 
@@ -109,4 +118,4 @@ module.exports.updateRows = function(files) {
 		files.push(path);
 		rows.push(formObject(path));
 	});
-}
+};
