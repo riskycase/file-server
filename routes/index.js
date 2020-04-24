@@ -11,20 +11,20 @@ router.get('/', function(req, res) {
 });
 
 /* POST home page. */
-router.post('/', storage.saveFiles , (req, res) => {
+router.post('/', storage.saveFiles , (req, res, next) => {
 	var files = req.files;
 	if (!files) {
 		const error = new Error('Please choose files');
-		error.httpStatusCode = 400;
+		error.status = 400;
 		return next(error);
 	}
 	storage.updateRows(files);
 	res.send(files);
 });
 
-module.exports = function(cli) {
+module.exports = async function(cli) {
 	
-	storage.init(cli);
+	await storage.init(cli);
 	return router;
 
 };

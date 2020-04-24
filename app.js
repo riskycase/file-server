@@ -15,7 +15,9 @@ app.set('view engine', 'ejs');
 
 app.use(zip());
 
-app.use(logger('dev'));
+if (process.env.NODE_ENV === 'devlopment') {
+	app.use(logger('dev'));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -23,9 +25,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/download', downloadRouter);
 
-module.exports = function(cli){
+module.exports = async function(cli){
 
-	var indexRouter = require('./routes/index')(cli);
+	var indexRouter = await require('./routes/index')(cli);
 	app.use('/', indexRouter);
 	
 	// catch 404 and forward to error handler

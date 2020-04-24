@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name: 'app',
+    name: 'www',
     script: './bin/www',
 
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/

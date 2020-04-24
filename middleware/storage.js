@@ -78,27 +78,40 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 module.exports.init = function(cli) {
-	
-	files = cli.input.map(value => value.replace(/\\/g, '/'));
-	rows = files.map(formObject);
-	destination = cli.flags.destination;
-	
-	if(!fs.existsSync(destination)) fs.mkdirSync(destination);
-	
-	//Read from list of files
-	if(cli.flags.list !== '') {
-		var readInterface = rl.createInterface({
-			input: fs.createReadStream(cli.flags.list),
-			output: process.stdout,
-			console: false
-		});
-		readInterface.on('line', function(line) {
-			if( files.indexOf(line) === -1 ) {
-				files.push(line);
-				rows.push(formObject(line));
-			}
-		});
-	}
+
+	return new Promise(function(resolve, reject) {
+		
+		files = cli.input.map(value => value.replace(/\\/g, '/'));
+		rows = files.map(formObject);
+		destination = cli.flags.destination;
+		
+		if(!fs.existsSync(destination)) fs.mkdirSync(destination);
+		
+		//Read from list of files
+		if(cli.flags.list !== '') {
+			var readInterface = rl.createInterface({
+				input: fs.createReadStream(cli.flags.list),
+				console: false
+			});
+			
+			readInterface.on('line', function(line) {
+				if( files.indexOf(line) === -1 ) {
+					files.push(line);
+					rows.push(formObject(line));
+				}
+			});
+			
+			readInterface.on('close', function() {
+				resolve();
+			});
+			
+		}
+		
+		else {
+			resolve();
+		}
+		
+	});
 
 };
 
@@ -112,10 +125,12 @@ module.exports.getPaths = function() {
 
 module.exports.saveFiles = upload.array('files[]');
 
-module.exports.updateRows = function(files) {
-	files.forEach(function (value) {
+module.exports.updateRows = function(uploadedFiles) {
+	
+	uploadedFiles.forEach(function (value) {
 		var path = value.path.replace(/\\/g, '/');
 		files.push(path);
 		rows.push(formObject(path));
 	});
+	
 };
