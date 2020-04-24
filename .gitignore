@@ -60,5 +60,8 @@ typings/
 # next.js build output
 .next
 
-#uploaded files
+# uploaded files
 uploads/*
+
+# test uploads
+dummy/uploads/*

@@ -7,36 +7,57 @@ function nameOf(path) {
 }
 
 /* Download single file */
-router.post('/', (req, res) => {
-	var path = storage.getPaths()[req.body.file];
-	if ( path.lastIndexOf('/')+1 === path.length ) {
-		var name = nameOf(path);
-		var namezip = name + '.zip';
-		res.zip({
-			'files':[
-				{ 'path': path, 'name': name }
-			],
-			'filename' : namezip
-		});
+router.post('/', (req, res, next) => {
+	var pathArray = storage.getPaths();
+	if( req.body.file >= 0 && req.body.file < pathArray.length ) {
+		var path = pathArray[req.body.file];
+		if ( path.lastIndexOf('/')+1 === path.length ) {
+			var name = nameOf(path);
+			var namezip = name + '.zip';
+			res.zip({
+				'files':[
+					{ 'path': path, 'name': name }
+				],
+				'filename' : namezip
+			});
+		}
+		else {
+			res.download(path);
+		}
+	}
+	else if( pathArray.length === 0 ) {
+		const error = new Error('There are no files for download!');
+		error.status = 403;
+		return next(error);
 	}
 	else {
-		res.download(path);
+		const error = new Error('Wrong data supplied!');
+		error.status = 400;
+		return next(error);
 	}
 });
 
 /* Download all files */
-router.get('/', (req, res) => {
-	var filesJSON = storage.getPaths().map( function(value) {
-		var name = nameOf(value);
-		return { 
-			'path': value,
-			'name': name,
-		};
-	});
-	res.zip({
-		'files': filesJSON,
-		'filename': 'allFiles.zip'
-	});
+router.get('/', (req, res, next) => {
+	var pathArray = storage.getPaths();
+	if( pathArray.length > 0 ) {
+		var filesJSON = pathArray.map( function(value) {
+			var name = nameOf(value);
+			return { 
+				'path': value,
+				'name': name,
+			};
+		});
+		res.zip({
+			'files': filesJSON,
+			'filename': 'allFiles.zip'
+		});
+	}
+	else {
+		const error = new Error('There are no files for download!');
+		error.status = 403;
+		return next(error);
+	}
 });
 
 module.exports = router;
