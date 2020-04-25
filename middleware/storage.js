@@ -21,7 +21,7 @@ function formObject(path) {
 	return {
 		'name': nameOf(path),
 		'icon': getIcon(path),
-		'size': humanFileSize(nfu.fsizeSync(path), true),
+		'size': humanFileSize(nfu.fsizeSync(path)),
 		'index': index++
 	};
 }
@@ -43,14 +43,12 @@ function getIcon(path) {
 }
 
 /* Convert file size to human readable */
-function humanFileSize(bytes, si) {
-	var thresh = si ? 1000 : 1024;
+function humanFileSize(bytes) {
+	var thresh = 1000;
 	if(Math.abs(bytes) < thresh) {
 		return bytes + ' B';
 	}
-	var units = si
-		? ['kB','MB','GB','TB','PB','EB','ZB','YB']
-		: ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+	var units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
 	var u = -1;
 	do {
 		bytes /= thresh;
@@ -58,7 +56,6 @@ function humanFileSize(bytes, si) {
 	}while(Math.abs(bytes) >= thresh && u < units.length - 1);
 	return bytes.toFixed(0)+' '+units[u];
 }
-
 
 /* Get unique elements only */
 function onlyUnique(value, index, self) { 
@@ -82,7 +79,7 @@ module.exports.init = function(cli) {
 	return new Promise(function(resolve, reject) {
 		
 		files = cli.input.map(value => value.replace(/\\/g, '/'));
-		rows = files.map(formObject);
+		files = files.filter(onlyUnique);
 		destination = cli.flags.destination;
 		
 		if(!fs.existsSync(destination)) fs.mkdirSync(destination);
@@ -97,17 +94,19 @@ module.exports.init = function(cli) {
 			readInterface.on('line', function(line) {
 				if( files.indexOf(line) === -1 ) {
 					files.push(line);
-					rows.push(formObject(line));
 				}
 			});
 			
 			readInterface.on('close', function() {
+				files = files.filter(onlyUnique);
+				rows = files.map(formObject);
 				resolve();
 			});
 			
 		}
 		
 		else {
+			rows = files.map(formObject);
 			resolve();
 		}
 		
@@ -123,14 +122,20 @@ module.exports.getPaths = function() {
 	return files;
 };
 
+module.exports.isFolder = function(index) {
+	return rows[index].icon === 'folder';
+};
+
 module.exports.saveFiles = upload.array('files[]');
 
 module.exports.updateRows = function(uploadedFiles) {
 	
 	uploadedFiles.forEach(function (value) {
 		var path = value.path.replace(/\\/g, '/');
-		files.push(path);
-		rows.push(formObject(path));
+		if ( files.indexOf(path) === -1 ) {
+			files.push(path);
+			rows.push(formObject(path));
+		}
 	});
 	
 };

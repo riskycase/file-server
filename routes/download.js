@@ -11,7 +11,7 @@ router.post('/', (req, res, next) => {
 	var pathArray = storage.getPaths();
 	if( req.body.file >= 0 && req.body.file < pathArray.length ) {
 		var path = pathArray[req.body.file];
-		if ( path.lastIndexOf('/')+1 === path.length ) {
+		if ( storage.isFolder(req.body.file) ) {
 			var name = nameOf(path);
 			var namezip = name + '.zip';
 			res.zip({

@@ -1,1 +1,2 @@
 dummy/dummy-down.txt
+dummy/dummy-folder
