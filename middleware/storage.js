@@ -2,6 +2,7 @@ var fs = require('fs');
 var rl = require('readline');
 var nfu = require('nodejs-fs-utils');
 var multer = require('multer');
+var path = require('path');
 	
 var files = [];
 var rows = [];
@@ -16,29 +17,19 @@ var icons = [
 ];
 
 // Form the row object that will be inserted into the view
-function formObject(path) {
-	path = path.replace(/\\/g, '/');
+function formObject(filePath) {
 	return {
-		'name': nameOf(path),
-		'icon': getIcon(path),
-		'size': humanFileSize(nfu.fsizeSync(path)),
+		'name': path.basename(filePath),
+		'icon': fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory() ? 'folder' : getIcon(path.extname(filePath).substring(path.extname(filePath).indexOf('.') + 1)),
+		'size': humanFileSize(nfu.fsizeSync(filePath)),
 		'index': index++
 	};
 }
-
-// Get the name of the file/folder from the path
-function nameOf(path) {
-	if ( path.lastIndexOf('/') === path.length - 1 ) path = path.substring(0, path.length - 1 );
-	return path.substring(path.lastIndexOf('/') + 1).replace('/','') ;
-}
-
-// Get the icon of the file/folder given path
-function getIcon(path) {
-	var ext = path.substring(path.indexOf('.') + 1) == path ? 'null' : path.substring(path.indexOf('.') + 1);
+// Get the icon of the file/folder given filePath
+function getIcon(ext) {
 	var icon = icons.find(function(value) {
 		return ext.match(value[1]);
 	})[0];
-	if ( fs.existsSync(path) && fs.lstatSync(path).isDirectory() ) icon =  'folder';
 	return icon;
 }
 
@@ -53,7 +44,7 @@ function humanFileSize(bytes) {
 	do {
 		bytes /= thresh;
 		++u;
-	}while(Math.abs(bytes) >= thresh && u < units.length - 1);
+	}while(Math.abs(bytes) >= thresh);
 	return bytes.toFixed(0)+' '+units[u];
 }
 
@@ -78,7 +69,7 @@ module.exports.init = function(cli) {
 
 	return new Promise(function(resolve, reject) {
 		
-		files = cli.input.map(value => value.replace(/\\/g, '/'));
+		files = cli.input;
 		files = files.filter(onlyUnique);
 		destination = cli.flags.destination;
 		
@@ -131,10 +122,10 @@ module.exports.saveFiles = upload.array('files[]');
 module.exports.updateRows = function(uploadedFiles) {
 	
 	uploadedFiles.forEach(function (value) {
-		var path = value.path.replace(/\\/g, '/');
-		if ( files.indexOf(path) === -1 ) {
-			files.push(path);
-			rows.push(formObject(path));
+		var filePath = value.path;
+		if ( files.indexOf(filePath) === -1 ) {
+			files.push(filePath);
+			rows.push(formObject(filePath));
 		}
 	});
 	
