@@ -1,28 +1,24 @@
 var router = require('express').Router();
 var storage = require('../middleware/storage');
-
-// Get the name of the file/folder from the path
-function nameOf(path) {
-	return (path.lastIndexOf('/')+1 === path.length) ? path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1 ) + 1, path.length - 1) : name = path.substring(path.lastIndexOf('/') + 1);
-}
+var path = require('path');
 
 /* Download single file */
 router.post('/', (req, res, next) => {
 	var pathArray = storage.getPaths();
 	if( req.body.file >= 0 && req.body.file < pathArray.length ) {
-		var path = pathArray[req.body.file];
+		var filePath = pathArray[req.body.file];
 		if ( storage.isFolder(req.body.file) ) {
-			var name = nameOf(path);
+			var name = path.basename(filePath);
 			var namezip = name + '.zip';
 			res.zip({
 				'files':[
-					{ 'path': path, 'name': name }
+					{ 'path': filePath, 'name': name }
 				],
 				'filename' : namezip
 			});
 		}
 		else {
-			res.download(path);
+			res.download(filePath);
 		}
 	}
 	else if( pathArray.length === 0 ) {
@@ -42,7 +38,7 @@ router.get('/', (req, res, next) => {
 	var pathArray = storage.getPaths();
 	if( pathArray.length > 0 ) {
 		var filesJSON = pathArray.map( function(value) {
-			var name = nameOf(value);
+			var name = path.basename(value);
 			return { 
 				'path': value,
 				'name': name,

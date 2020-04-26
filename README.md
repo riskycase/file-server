@@ -35,7 +35,7 @@ pm2 commands. Therefore for stopping the server we use `pm2 kill`
 
 	Options
 	  --destination, -d	PATH	Save uploaded files to folder specified in path (defaults to uploads folder in local working directory)
-	  --list, -l		PATH	Read files to share from the lsit given in path
+	  --list, -l		PATH	Read files to share from the list given in path
 
 	Examples
 	  $ npm start 
