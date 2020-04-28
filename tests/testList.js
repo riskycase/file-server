@@ -147,6 +147,6 @@ describe('When sharing from a list', () => {
 	after(function(done) {
 		delete require.cache[require.resolve('../app')];
 		done();
-	})
+	});
 	
 });

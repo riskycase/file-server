@@ -122,6 +122,6 @@ describe('When not sharing anything', () => {
 	after(function(done) {
 		delete require.cache[require.resolve('../app')];
 		done();
-	})
+	});
 	
 });

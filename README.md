@@ -1,4 +1,4 @@
-# File sharing server
+# ![Logo](./icon.png) Broadcast 'em
 A file server based on node.js that allows sharing on the same local network, 
 and possibly over the internet if bridging is used
 

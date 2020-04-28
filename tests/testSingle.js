@@ -129,4 +129,9 @@ describe('When sharing a single file', () => {
 	
 	it('it should download a zip with name allFiles.zip', downloadAllTest);
 	
+	after(function(done) {
+		delete require.cache[require.resolve('../app')];
+		done();
+	});
+	
 });
