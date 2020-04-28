@@ -165,6 +165,6 @@ describe('When sharing with repititions', () => {
 	after(function(done) {
 		delete require.cache[require.resolve('../app')];
 		done();
-	})
+	});
 	
 });

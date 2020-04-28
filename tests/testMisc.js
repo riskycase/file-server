@@ -43,6 +43,6 @@ describe('Miscalleneous tests', () => {
 	after(function(done) {
 		delete require.cache[require.resolve('../app')];
 		done();
-	})
+	});
 	
 });
