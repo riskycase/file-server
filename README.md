@@ -34,8 +34,9 @@ pm2 commands. Therefore for stopping the server we use `pm2 kill`
 	  files is an array of paths to files you want to share
 
 	Options
-	  --destination, -d	PATH	Save uploaded files to folder specified in path (defaults to uploads folder in local working directory)
+	  --destination, -d	PATH	Save uploaded files to folder specified in path (defaults to uploads folder in app directory)
 	  --list, -l		PATH	Read files to share from the list given in path
+	  --port, -p		PORT	Start server on specified port (default 3000)
 
 	Examples
 	  $ npm start 
@@ -45,7 +46,7 @@ pm2 commands. Therefore for stopping the server we use `pm2 kill`
 * Get the IP address of the current device (which is host) on the local network
 (let us assume it to be `192.168.1.2`)
 * On another device present on the same network, open the following link:
-`(IP address):3000` (here `192.168.1.2:3000`)
+`(IP address):(port)` (here `192.168.1.2:3000`)
 * Download the files shared and/or upload any files you want to share to the 
 host device
 * Retrieve the files sent from the uploads folder
