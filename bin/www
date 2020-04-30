@@ -19,8 +19,9 @@ var cli = meow(`
 	  files is an array of paths to files you want to share
 
 	Options
-	  --destination, -d	PATH	Save uploaded files to folder specified in path (defaults to uploads folder in local working directory)
+	  --destination, -d	PATH	Save uploaded files to folder specified in path (defaults to uploads folder in app directory)
 	  --list, -l		PATH	Read files to share from the list given in path
+	  --port, -p		PORT	Start server on specified port (default 3000)
 
 	Examples
 	  $ npm start 
@@ -36,6 +37,11 @@ var cli = meow(`
 			type: 'string',
 			default: '',
 			alias: 'l'
+		},
+		port: {
+			type: 'number',
+			default: 3000,
+			alias: 'p'
 		}
 	}
 });
@@ -50,7 +56,7 @@ require('../app')(cli).then((app) =>{
 	 * Get port from environment and store in Express.
 	 */
 
-	var port = normalizePort(process.env.PORT || '3000');
+	var port = normalizePort(cli.flags.port);
 	app.set('port', port);
 
 	/**
