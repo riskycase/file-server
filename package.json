@@ -1,11 +1,18 @@
 {
-  "name": "file-server",
+  "name": "broadcast-em",
   "version": "1.0.0",
+  "author": "Hrishikesh Patil",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "start": "pm2 start ./bin/www -- ",
     "test": "nyc --reporter=text mocha tests/*.js",
     "dev": "pm2 start ./bin/www --watch -- "
+  },
+  "bin": "./bin/www",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/riskycase/file-server.git"
   },
   "dependencies": {
     "chai": "^4.2.0",
