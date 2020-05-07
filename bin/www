@@ -7,6 +7,7 @@
 var debug = require('debug')('file-server:server');
 var http = require('http');
 var meow = require('meow');
+var path = require('path');
 
 process.env.NODE_ENV = 'production';
 
@@ -30,7 +31,7 @@ var cli = meow(`
 	flags: {
 		destination: {
 			type: 'string',
-			default: 'uploads',
+			default: path.resolve(__dirname, '../uploads'),
 			alias: 'd'
 		},
 		list: {
