@@ -17,7 +17,7 @@ var icons = [
 ];
 
 // Form the row object that will be inserted into the view
-function formObject(filePath) {
+function formObject(filePath, index) {
 	return {
 		'name': path.basename(filePath),
 		'icon': fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory() ? 'folder' : getIcon(path.extname(filePath).substring(path.extname(filePath).indexOf('.') + 1)),
@@ -73,7 +73,10 @@ module.exports.init = function(cli) {
 		files = files.filter(onlyUnique);
 		destination = cli.flags.destination;
 		
-		if(!fs.existsSync(destination)) fs.mkdirSync(destination);
+		fs.access(destination, fs.constants.F_OK, (err) => {
+			if(err)
+				fs.mkdirSync(destination, { recursive: true });
+		});
 		
 		//Read from list of files
 		if(cli.flags.list !== '') {
@@ -122,10 +125,14 @@ module.exports.saveFiles = upload.array('files[]');
 module.exports.updateRows = function(uploadedFiles) {
 	
 	uploadedFiles.forEach(function (value) {
-		var filePath = value.path;
-		if ( files.indexOf(filePath) === -1 ) {
-			files.push(filePath);
-			rows.push(formObject(filePath));
+		if ( files.indexOf(value.path) === -1 ) {
+			files.push(value.path);
+			rows.push({
+				'name': value.filename,
+				'icon': getIcon(path.extname(value.filename).substring(path.extname(value.filename).indexOf('.') + 1)),
+				'size': humanFileSize(value.size),
+				'index': index++
+			});
 		}
 	});
 	
