@@ -4,17 +4,17 @@
  * Module dependencies.
  */
 
-var debug = require('debug')('file-server:server');
-var http = require('http');
-var meow = require('meow');
-var path = require('path');
+const debug = require('debug')('file-server:server');
+const http = require('http');
+const meow = require('meow');
+const path = require('path');
 
 process.env.NODE_ENV = 'production';
 
 /** 
  * Accept CLI arguments
  */
-var cli = meow(`
+const cli = meow(`
 	Usage
 	  $ npm start [options] [files]
 	  files is an array of paths to files you want to share
@@ -36,7 +36,7 @@ var cli = meow(`
 		},
 		list: {
 			type: 'string',
-			default: '',
+			default: undefined,
 			alias: 'l'
 		},
 		port: {
@@ -57,14 +57,14 @@ require('../app')(cli).then((app) =>{
 	 * Get port from environment and store in Express.
 	 */
 
-	var port = normalizePort(cli.flags.port);
+	const port = normalizePort(cli.flags.port);
 	app.set('port', port);
 
 	/**
 	 * Create HTTP server.
 	 */
 
-	var server = http.createServer(app);
+	const server = http.createServer(app);
 
 	/**
 	 * Listen on provided port, on all network interfaces.
@@ -79,7 +79,7 @@ require('../app')(cli).then((app) =>{
 	 */
 
 	function normalizePort(val) {
-	  var port = parseInt(val, 10);
+	  const port = parseInt(val, 10);
 
 	  if (isNaN(port)) {
 		// named pipe
@@ -103,7 +103,7 @@ require('../app')(cli).then((app) =>{
 		throw error;
 	  }
 
-	  var bind = typeof port === 'string'
+	  const bind = typeof port === 'string'
 		? 'Pipe ' + port
 		: 'Port ' + port;
 
@@ -127,8 +127,8 @@ require('../app')(cli).then((app) =>{
 	 */
 
 	function onListening() {
-	  var addr = server.address();
-	  var bind = typeof addr === 'string'
+	  const addr = server.address();
+	  const bind = typeof addr === 'string'
 		? 'pipe ' + addr
 		: 'port ' + addr.port;
 	  debug('Listening on ' + bind);
