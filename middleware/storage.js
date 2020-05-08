@@ -1,14 +1,14 @@
-var fs = require('fs');
-var rl = require('readline');
-var nfu = require('nodejs-fs-utils');
-var multer = require('multer');
-var path = require('path');
+const fs = require('fs');
+const rl = require('readline');
+const nfu = require('nodejs-fs-utils');
+const multer = require('multer');
+const path = require('path');
 	
-var files = [];
-var rows = [];
-var index = 0;
-var destination;
-var icons = [
+let files = [];
+let rows = [];
+let index = 0;
+let destination;
+const icons = [
 	['image','jpg|jpeg|png|dng|bmp|tiff'],
 	['play','mp3|ogg|avi|mp4|flac'],
 	['file-text','txt|doc|docx'],
@@ -17,30 +17,24 @@ var icons = [
 ];
 
 // Form the row object that will be inserted into the view
-function formObject(filePath, index) {
-	return {
-		'name': path.basename(filePath),
-		'icon': fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory() ? 'folder' : getIcon(path.extname(filePath).substring(path.extname(filePath).indexOf('.') + 1)),
-		'size': humanFileSize(nfu.fsizeSync(filePath)),
-		'index': index++
-	};
-}
+const formObject = (filePath, index) => ({
+	'name': path.basename(filePath),
+	'icon': fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory() ? 'folder' : getIcon(path.extname(filePath).substring(path.extname(filePath).indexOf('.') + 1)),
+	'size': humanFileSize(nfu.fsizeSync(filePath)),
+	'index': index++
+});
+
 // Get the icon of the file/folder given filePath
-function getIcon(ext) {
-	var icon = icons.find(function(value) {
-		return ext.match(value[1]);
-	})[0];
-	return icon;
-}
+const getIcon = (ext) => icons.find((value) => ext.match(value[1]))[0];
 
 /* Convert file size to human readable */
 function humanFileSize(bytes) {
-	var thresh = 1000;
+	const thresh = 1000;
 	if(Math.abs(bytes) < thresh) {
 		return bytes + ' B';
 	}
-	var units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
-	var u = -1;
+	const units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
+	let u = -1;
 	do {
 		bytes /= thresh;
 		++u;
@@ -49,12 +43,10 @@ function humanFileSize(bytes) {
 }
 
 /* Get unique elements only */
-function onlyUnique(value, index, self) { 
-	return self.indexOf(value) === index;
-}
+const onlyUnique = (value, index, self) => self.indexOf(value) === index;
 
 // SET STORAGE
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, destination);
 	},
@@ -63,62 +55,45 @@ var storage = multer.diskStorage({
 	}
 });
 
-var upload = multer({ storage: storage });
-
-module.exports.init = function(cli) {
-
-	return new Promise(function(resolve, reject) {
-		
-		files = cli.input;
-		files = files.filter(onlyUnique);
-		destination = cli.flags.destination;
-		
-		fs.access(destination, fs.constants.F_OK, (err) => {
-			if(err)
-				fs.mkdirSync(destination, { recursive: true });
-		});
-		
-		//Read from list of files
-		if(cli.flags.list !== '') {
-			var readInterface = rl.createInterface({
-				input: fs.createReadStream(cli.flags.list),
-				console: false
-			});
-			
-			readInterface.on('line', function(line) {
-				if( files.indexOf(line) === -1 ) {
-					files.push(line);
-				}
-			});
-			
-			readInterface.on('close', function() {
-				files = files.filter(onlyUnique);
-				rows = files.map(formObject);
-				resolve();
-			});
-			
-		}
-		
-		else {
-			rows = files.map(formObject);
-			resolve();
-		}
-		
+async function readLines(listPath) {
+	
+	const readInterface = rl.createInterface({
+		input: fs.createReadStream(listPath),
+		console: false
 	});
 
+	for await (const line of readInterface) {
+		if( files.indexOf(line) === -1 ) {
+			files.push(line);
+		}
+	}
+
+}
+
+const upload = multer({ storage: storage });
+
+module.exports.init = async function(cli) {
+	
+	files = cli.input.filter(onlyUnique);
+	destination = cli.flags.destination;
+	
+	fs.access(destination, fs.constants.F_OK, (err) => {
+		if(err)
+			fs.mkdirSync(destination, { recursive: true });
+	});
+	
+	if(cli.flags.list) await readLines(cli.flags.list);
+
+	files = files.filter(onlyUnique);		
+	rows = files.map(formObject);
+
 };
 
-module.exports.getRows = function() {
-	return rows;
-};
+module.exports.getRows = () => rows;
 
-module.exports.getPaths = function() {
-	return files;
-};
+module.exports.getPaths = () => files;
 
-module.exports.isFolder = function(index) {
-	return rows[index].icon === 'folder';
-};
+module.exports.isFolder = (index) => rows[index].icon === 'folder';
 
 module.exports.saveFiles = upload.array('files[]');
 
