@@ -82,7 +82,7 @@ module.exports.init = async function(cli) {
 			fs.mkdirSync(destination, { recursive: true });
 	});
 	
-	if(cli.flags.list) await readLines(cli.flags.list);
+	if(cli.flags.list !== '') await readLines(cli.flags.list);
 
 	files = files.filter(onlyUnique);		
 	rows = files.map(formObject);
