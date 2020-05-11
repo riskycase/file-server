@@ -36,7 +36,7 @@ const cli = meow(`
 		},
 		list: {
 			type: 'string',
-			default: undefined,
+			default: '',
 			alias: 'l'
 		},
 		port: {
