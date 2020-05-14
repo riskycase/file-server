@@ -5,7 +5,7 @@ A file server based on node.js that allows sharing files over HTTP on the same
 ## Badges
 [![Build Status](https://travis-ci.com/riskycase/file-server.svg?branch=master)](https://travis-ci.com/riskycase/file-server)
 [![Depfu](https://badges.depfu.com/badges/676150a60ab4fce2f90451fc5422a308/status.svg)](https://depfu.com)
-[![Depfu](https://badges.depfu.com/badges/676150a60ab4fce2f90451fc5422a308/overview.svg)](https://depfu.com/github/riskycase/file-server?project_id=12583)
+[![Depfu](https://badges.depfu.com/badges/676150a60ab4fce2f90451fc5422a308/overview.svg)](https://depfu.com/gitlab/riskycase/file-server?project_id=12583)
 [![Maintainability](https://api.codeclimate.com/v1/badges/1211097ff94e3af18c35/maintainability)](https://codeclimate.com/github/riskycase/file-server/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/1211097ff94e3af18c35/test_coverage)](https://codeclimate.com/github/riskycase/file-server/test_coverage)
 
