@@ -11,14 +11,14 @@ A file server based on node.js that allows sharing files over HTTP on the same
 
 ## Setup
 
-* Make sure node.js is installed along with npm
+* Make sure node.js is installed along with npm, and yarn is available (npm 
+install -g yarn)
 * Open a command line tool (Command Prompt or Powershell for Windows and bash
 shell in Linux)
 * Clone the repo `git clone https://github.com/riskycase/file-server.git` or 
 your own fork
 * Navigate to the folder `cd file-server`
-* Install all dependencies `npm install` or optionally do a global install 
-`npm install -g`
+* Install all dependencies `yarn install`
 * Start the server using the inbuilt script `npm start`
 * Open a browser and go to `localhost:3000` to make sure everything is working
 
