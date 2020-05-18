@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Required meta tags-->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<!-- UIkit CSS-->
+		<link rel="stylesheet" href="../public/stylesheets/uikit.css">
+		<!-- UIkit JS-->
+		<script src="../public/scripts/uikit.js"></script>
+		<script src="../public/scripts/uikit-icons.js"></script>
+		
+		<title>Broadcast 'em - Control Panel</title>
+		<style>
+			@font-face {
+				font-family: 'Source Sans Pro';
+				src: local('SourceSansPro'), url('../public/fonts/SourceSansPro-Regular.ttf') format('truetype');
+			}
+
+			body {
+				font-family: 'Source Sans Pro';
+				height: 100vh;
+			}
+			
+			.uk-button-success {
+				background-color: #28a745;
+				color: #fff;
+				border: 1px solid transparent;
+			}
+			
+			.uk-button-success:hover, uk-button-success:focus {
+				background-color: #23953d;
+				color: #fff;
+				border: 1px solid transparent;
+			}
+			
+			.uk-button-success:active {
+				background-color: #1e8235;
+				color: #fff;
+				border: 1px solid transparent;
+			}
+		</style>
+	</head>
+	
+	<body class="uk-background-secondary uk-light">
+  
+		<header>
+			<div uk-sticky="animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky uk-navbar-transparent; cls-inactive: uk-navbar-transparent uk-light; top: 200">
+				<nav class="uk-navbar-container uk-background-primary uk-padding-small" uk-navbar="">
+					<div class="uk-navbar-center">
+						<div class="uk-navbar-logo uk-text-large">Broadcast 'em - Control Panel</div>
+					</div>
+				</nav>
+			</div>
+		</header>
+		
+		<div id="main" class="uk-card uk-padding-small uk-height-expand" uk-grid>
+			
+			<div id="files" class="uk-width-1-1">
+				
+				<button id="file-select" class="uk-button uk-button-default" uk-tooltip="title: Select the files you would like to share; pos: bottom">Select files</button>
+				
+				<button id="folder-select" class="uk-button uk-button-default" uk-tooltip="title: Select the folders you would like to share (will be shared as zip files); pos: bottom">Select folders</button>
+				
+				<div id="selected-files">No files selected</div>
+				
+			</div>
+			
+			<div id="list" class="uk-width-1-1">
+				
+				<button id="list-select" class="uk-button uk-button-default uk-margin-right" uk-tooltip="title: Select the file which contains a newline-seperated list of paths to the files/folders you would like to share; pos: right">Select list file</button>
+				
+				<span id="selected-list">No list file selected!</span>
+				
+			</div>
+			
+			<div id="destination" class="uk-width-1-1">
+			
+				<button id="dest-select" class="uk-button uk-button-default uk-margin-right" uk-tooltip="title: Select the folder where you want the incoming files to be saved; pos: right">Select upload folder</button>
+				
+				<span id="selected-dest">Current</span>
+			
+			</div>
+			
+			<div id="port-info" class="uk-width-1-1">
+			
+				<span>Port: </span>
+				
+				<input id="port" type="number" value=3000 min=0 class="uk-margin-left uk-input uk-width-auto" uk-tooltip="title: Select the port where the server should listen; pos: right"></input>
+			
+			</div>
+			
+			<div id="server-control">
+				
+				<button id="start-server" class="uk-button uk-button-success">Start Server</button>
+				<button id="kill-server" class="uk-button uk-button-danger" style="display: none">Kill Server</button>
+
+				<span id="message"></span>
+				<div id="ip-address" uk-tooltip="title: Enter this address into the URL bar of the browser in the device connected to respective network"></div>
+
+			</div>
+			
+		</div>
+		
+		<script src="./renderer.js"></script>
+		
+	</body>
+</html>
