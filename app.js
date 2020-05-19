@@ -1,7 +1,5 @@
-const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const zip = require('express-easy-zip');
 
@@ -20,7 +18,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use(zip());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/download', downloadRouter);
@@ -33,7 +30,9 @@ module.exports = async function(cli){
 	
 	// catch 404 and forward to error handler
 	app.use(function(req, res, next) {
-		next(createError(404));
+		const error = new Error('Resource not found');
+		error.status = 404;
+		return next(error);
 	});
 
 	// error handler
