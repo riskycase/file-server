@@ -30,7 +30,7 @@ jobs:
       script:
         - npm test
     - stage: Build
-      if: tag IS blank
+      if: NOT tag IS present
       script:
          - |
             if [ "$TRAVIS_OS_NAME" == "linux" ]; then
