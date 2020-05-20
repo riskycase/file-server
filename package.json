@@ -82,8 +82,19 @@
 				}
 			]
 		},
+		"mac": {
+			"target": [
+				{
+					"target": "dmg",
+					"arch": [
+						"x64",
+						"ia32"
+					]
+				}
+			]
+		},
 		"dmg": {
-			"artifactName": "broadcast-em-${version}.${ext}"
+			"artifactName": "broadcast-em-${version}-${arch}.${ext}"
 		},
 		"nsis": {
 			"artifactName": "broadcast-em-${version}-setup.${ext}"
