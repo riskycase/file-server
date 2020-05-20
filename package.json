@@ -88,11 +88,7 @@
 			"artifactName": "broadcast-em-${version}-setup.${ext}"
 		},
 		"portable": {
-<<<<<<< HEAD
-			"artifactName": "broadcast-em-${version}-portable}.${ext}"
-=======
 			"artifactName": "broadcast-em-${version}-portable.${ext}"
->>>>>>> 0d29cfb981af362d89dc7c5e44aa8e8e9e57ad8d
 		},
 		"deb": {
 			"artifactName": "broadcast-em-${version}-${arch}.${ext}"
