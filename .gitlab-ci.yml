@@ -11,5 +11,9 @@ cache:
 
 test:
   script:
-    - npm install
-    - npm test
+    - yarn install
+    - yarn test
+build:
+  script:
+    - yarn install
+    - yarn build
