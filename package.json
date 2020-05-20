@@ -8,7 +8,7 @@
 	"scripts": {
 		"start": "node ./bin/www -- ",
 		"elec": "electron index.js",
-		"build": "electron-builder --publish never",
+		"build": "electron-builder --publish onTagOrDraft",
 		"release": "electron-builder",
 		"test": "nyc --reporter=text mocha tests/*.js"
 	},
@@ -85,11 +85,7 @@
 		"mac": {
 			"target": [
 				{
-					"target": "dmg",
-					"arch": [
-						"x64",
-						"ia32"
-					]
+					"target": "dmg"
 				}
 			]
 		},
