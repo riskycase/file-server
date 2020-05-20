@@ -1,101 +1,103 @@
 {
-  "name": "broadcast-em",
-  "version": "1.0.0",
-  "description": "A file server based on node.js that allows sharing files over HTTP on the same local network, and possibly over the internet if bridging is used",
-  "author": "Hrishikesh Patil",
-  "private": true,
-  "license": "GPL-3.0-or-later",
-  "scripts": {
-    "start": "node ./bin/www -- ",
-    "elec": "electron index.js",
-    "release": "electron-builder -p onTag",
-    "test": "nyc --reporter=text mocha tests/*.js"
-  },
-  "bin": "./bin/www",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/riskycase/file-server.git"
-  },
-  "dependencies": {
-    "debug": "~4.1.1",
-    "ejs": "^3.1.2",
-    "express": "~4.17.1",
-    "express-easy-zip": "^1.1.5",
-    "meow": "^7.0.1",
-    "morgan": "~1.10.0",
-    "multer": "^1.4.2",
-    "nodejs-fs-utils": "^1.2.5"
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0",
-    "electron": "^8.2.5",
-    "electron-builder": "^22.6.1",
-    "eslint": "^7.0.0",
-    "mocha": "^7.1.2",
-    "nyc": "^15.0.1"
-  }, 
-  "build": {
-    "appId": "com.riskycase.broadcast-em",
-    "productName": "Broadcast 'em",
-    "files": [
-      "**/*",
-      "!**/.*",
-	  "!{dummy,tests,bin}",
-	  "!*.log"
-    ],
-	"linux": {
-	  "target": [
-	    {
-		  "target": "deb",
-		  "arch": [
-		    "x64",
-			"ia32"
-		  ]
+	"name": "broadcast-em",
+	"version": "1.0.0",
+	"description": "A file server based on node.js that allows sharing files over HTTP on the same local network, and possibly over the internet if bridging is used",
+	"author": "Hrishikesh Patil",
+	"private": true,
+	"license": "GPL-3.0-or-later",
+	"scripts": {
+		"start": "node ./bin/www -- ",
+		"elec": "electron index.js",
+		"release": "electron-builder -p onTag",
+		"test": "nyc --reporter=text mocha tests/*.js"
+	},
+	"bin": "./bin/www",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/riskycase/file-server.git"
+	},
+	"dependencies": {
+		"debug": "~4.1.1",
+		"ejs": "^3.1.2",
+		"express": "~4.17.1",
+		"express-easy-zip": "^1.1.5",
+		"meow": "^7.0.1",
+		"morgan": "~1.10.0",
+		"multer": "^1.4.2",
+		"nodejs-fs-utils": "^1.2.5"
+	},
+	"devDependencies": {
+		"chai": "^4.2.0",
+		"chai-http": "^4.3.0",
+		"electron": "^8.2.5",
+		"electron-builder": "^22.6.1",
+		"eslint": "^7.0.0",
+		"mocha": "^7.1.2",
+		"nyc": "^15.0.1"
+	},
+	"build": {
+		"appId": "com.riskycase.broadcast-em",
+		"productName": "Broadcast 'em",
+		"files": [
+			"**/*",
+			"!**/.*",
+			"!{dummy,tests,bin}",
+			"!*.log"
+		],
+		"linux": {
+			"target": [
+				{
+					"target": "deb",
+					"arch": [
+						"x64",
+						"ia32"
+					]
+				},
+				{
+					"target": "AppImage",
+					"arch": [
+						"x64",
+						"ia32"
+					]
+				}
+			],
+			"maintainer": "Hrishikesh Patil"
 		},
-	    {
-		  "target": "AppImage",
-		  "arch": [
-		    "x64",
-			"ia32"
-		  ]
-		}
-	  ],
-	  "maintainer": "Hrishikesh Patil"
-	},
-	"win": {
-	  "target": [
-	    {
-		  "target": "nsis",
-		  "arch": [
-		    "x64",
-			"ia32"
-		  ]
+		"win": {
+			"target": [
+				{
+					"target": "nsis",
+					"arch": [
+						"x64",
+						"ia32"
+					]
+				},
+				{
+					"target": "portable",
+					"arch": [
+						"x64",
+						"ia32"
+					]
+				}
+			]
 		},
-	    {
-		  "target": "portable",
-		  "arch": [
-		    "x64",
-			"ia32"
-		  ]
-		}
-	  ]
-	},
-	"dmg": {
-	  "artifactName": "broadcast-em-${version}.${ext}"
-	},
-	"nsis": {
-	  "artifactName": "broadcast-em-${version}-Setup.${ext}"
-	},
-	"portable": {
-	  "artifactName": "broadcast-em-${version}-${arch}.${ext}"
-	},
-	"deb": {
-	  "artifactName": "broadcast-em-${version}-${arch}.${ext}"
-	},
-	"appImage": {
-	  "artifactName": "broadcast-em-${version}-${arch}.${ext}"
-	},
-	"publish": ["github"]
-  }
+		"dmg": {
+			"artifactName": "broadcast-em-${version}.${ext}"
+		},
+		"nsis": {
+			"artifactName": "broadcast-em-${version}-setup.${ext}"
+		},
+		"portable": {
+			"artifactName": "broadcast-em-${version}-portable}.${ext}"
+		},
+		"deb": {
+			"artifactName": "broadcast-em-${version}-${arch}.${ext}"
+		},
+		"appImage": {
+			"artifactName": "broadcast-em-${version}-${arch}.${ext}"
+		},
+		"publish": [
+			"github"
+		]
+	}
 }
