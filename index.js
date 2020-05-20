@@ -1,7 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const os = require('os');
 const http = require('http');
-const path = require('path');
 
 let contents;
 let server;
@@ -9,7 +8,7 @@ let server;
 let cli = {
 	files: [],
 	list: '',
-	dest: path.resolve(__dirname, './uploads'),
+	dest: app.getPath('downloads'),
 	port: 3000
 };
 
@@ -93,7 +92,7 @@ function filesEditor () {
 }
 
 function launchServer() {
-		contents.send('status', 'initiating');
+	contents.send('status', 'initiating');
 	require('./app')({
 		input: cli.files,
 		flags: {

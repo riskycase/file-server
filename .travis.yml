@@ -1,18 +1,38 @@
-env:
-  global:
-    - CC_TEST_REPORTER_ID=2b76e7897278266cddad1b9c481642f4917a5905c565dfacd96391598b685db1
+matrix:
+  include:
+    # - os: osx
+      # osx_image: xcode10.2
+      # language: node_js
+      # node_js: node
+      # env:
+        # - ELECTRON_CACHE=$HOME/.cache/electron
+        # - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
-language: node_js
-node_js:
-  - node
+    - os: linux
+      services: docker
+      language: generic
 
-before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
+cache:
+  directories:
+    - node_modules
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
 
 script:
-  - nyc --reporter=lcov npm run test
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      docker run --rm \
+        -v ${PWD}:/project \
+        -v ~/.cache/electron:/root/.cache/electron \
+        -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+        electronuserland/builder:wine \
+        /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn release --linux --win"
+    else
+      yarn release
+    fi
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
 
-after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+branches:
+  except:
+    - "/^v\\d+\\.\\d+\\.\\d+$/"
