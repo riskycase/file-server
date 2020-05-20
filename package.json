@@ -38,7 +38,7 @@
 	},
 	"build": {
 		"appId": "com.riskycase.broadcast-em",
-		"productName": "Broadcast 'em",
+		"productName": "Broadcast em",
 		"files": [
 			"**/*",
 			"!**/.*",
