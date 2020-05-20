@@ -8,7 +8,8 @@
 	"scripts": {
 		"start": "node ./bin/www -- ",
 		"elec": "electron index.js",
-		"build": "electron-builder",
+		"build": "electron-builder --publish never",
+		"release": "electron-builder",
 		"test": "nyc --reporter=text mocha tests/*.js"
 	},
 	"bin": "./bin/www",
