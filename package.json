@@ -8,6 +8,7 @@
 	"scripts": {
 		"start": "node ./bin/www -- ",
 		"elec": "electron index.js",
+		"build": "electron-builder",
 		"release": "electron-builder -p always",
 		"test": "nyc --reporter=text mocha tests/*.js"
 	},
