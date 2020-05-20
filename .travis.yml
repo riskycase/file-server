@@ -1,12 +1,12 @@
 matrix:
   include:
-    # - os: osx
-      # osx_image: xcode10.2
-      # language: node_js
-      # node_js: node
-      # env:
-        # - ELECTRON_CACHE=$HOME/.cache/electron
-        # - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+    - os: osx
+      osx_image: xcode10.2
+      language: node_js
+      node_js: node
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
     - os: linux
       services: docker
@@ -17,6 +17,12 @@ cache:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
+
+install:
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew install yarn;
+    fi
 
 jobs:
   include:
