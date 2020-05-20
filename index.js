@@ -98,27 +98,28 @@ function launchServer() {
 		flags: {
 			destination: cli.dest,
 			list: cli.list,
-			port: cli.port
 		}
-	}).then((app) =>{
-		contents.send('status', 'initiated');
-		server = http.createServer(app);
-		contents.send('status', 'created');
-		try {
-			server.listen(cli.port);
-			contents.send('status', 'binded');
-			const ni = os.networkInterfaces();
-			let addrs = [];
-			for (const iface in ni) {
-				const ip4 = ni[iface].find(iface => iface.family === 'IPv4');
-				if(!ip4.internal) addrs.push([iface, ip4.address]);
-			}
-			contents.send('address', addrs);
+	}).then(createServer);
+}
+
+function createServer(app) {
+	contents.send('status', 'initiated');
+	server = http.createServer(app);
+	contents.send('status', 'created');
+	try {
+		server.listen(cli.port);
+		contents.send('status', 'binded');
+		const ni = os.networkInterfaces();
+		let addrs = [];
+		for (const iface in ni) {
+			const ip4 = ni[iface].find(iface => iface.family === 'IPv4');
+			if(!ip4.internal) addrs.push([iface, ip4.address]);
 		}
-		catch (err) {
-			if(err.code === 'EACCESS') contents.send('status', 'port-err');
-		}
-	});
+		contents.send('address', addrs);
+	}
+	catch (err) {
+		if(err.code === 'EACCESS') contents.send('status', 'port-err');
+	}
 }
 
 function destroyServer() {
