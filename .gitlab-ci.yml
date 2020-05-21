@@ -2,6 +2,7 @@ image: node:latest
 
 stages:
   - test
+  - build
 
 cache:
   paths:
@@ -12,3 +13,9 @@ Test:
   script:
     - yarn install
     - yarn test
+
+Build:
+  stage: build
+  script:
+    - yarn install
+    - yarn build
