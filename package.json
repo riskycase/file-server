@@ -1,6 +1,6 @@
 {
 	"name": "broadcast-em",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A file server based on node.js that allows sharing files over HTTP on the same local network, and possibly over the internet if bridging is used",
 	"author": "Hrishikesh Patil",
 	"private": true,
@@ -8,8 +8,8 @@
 	"scripts": {
 		"start": "node ./bin/www -- ",
 		"elec": "electron index.js",
-		"build": "electron-builder --publish onTagOrDraft",
-		"release": "electron-builder",
+		"build": "electron-builder --publish never",
+		"release": "electron-builder --publish onTagOrDraft",
 		"test": "nyc --reporter=text mocha tests/*.js"
 	},
 	"bin": "./bin/www",
@@ -90,19 +90,19 @@
 			]
 		},
 		"dmg": {
-			"artifactName": "broadcast-em-${version}-${arch}.${ext}"
+			"artifactName": "broadcast-em-mac-${version}-${arch}.${ext}"
 		},
 		"nsis": {
-			"artifactName": "broadcast-em-${version}-setup.${ext}"
+			"artifactName": "broadcast-em-windows-${version}-setup.${ext}"
 		},
 		"portable": {
-			"artifactName": "broadcast-em-${version}-portable.${ext}"
+			"artifactName": "broadcast-em-windows-${version}-portable.${ext}"
 		},
 		"deb": {
-			"artifactName": "broadcast-em-${version}-${arch}.${ext}"
+			"artifactName": "broadcast-em-linux-${version}-${arch}.${ext}"
 		},
 		"appImage": {
-			"artifactName": "broadcast-em-${version}-${arch}.${ext}"
+			"artifactName": "broadcast-em-linux-${version}-${arch}.${ext}"
 		},
 		"publish": [
 			"github"
