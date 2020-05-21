@@ -82,12 +82,12 @@ function shareSelector (type) {
 	if (type === 'file') {
 		properties.push('openFile');
 		title = 'Select files to share';
-		label: 'Add files'
+		label = 'Add files';
 	}
 	else {
 		properties.push('openDirectory');
 		title = 'Select folders to share';
-		label = 'Add folders'
+		label = 'Add folders';
 	}
 	dialog.showOpenDialog({
 		title: title,
@@ -165,7 +165,7 @@ function getAddresses() {
 		const ip4 = ni[iface].find(iface => iface.family === 'IPv4');
 		if(!ip4.internal) addresses.push([iface, ip4.address]);
 	}
-	return addresses
+	return addresses;
 }
 
 function createServer(app) {
