@@ -17,6 +17,7 @@ cache:
   - "node_modules"
   - "$HOME/.cache/electron"
   - "$HOME/.cache/electron-builder"
+if: tag IS present
 script:
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
