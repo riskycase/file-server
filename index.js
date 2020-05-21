@@ -2,136 +2,6 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const os = require('os');
 const http = require('http');
 
-let contents;
-let server;
-
-let cli = {
-	files: [],
-	list: '',
-	dest: app.getPath('downloads'),
-	port: 3000
-};
-
-ipcMain.on('input', (event, message, ...args) => {
-	if (message === 'file-select') fileSelector();
-	else if (message === 'folder-select') folderSelector();
-	else if (message === 'list-select') listSelector();
-	else if (message === 'dest-select') destSelector();
-	else if (message === 'port') portSelector(message, ...args);
-	else if (message === 'start-server') launchServer();
-	else if (message === 'kill-server') destroyServer();
-});
-
-ipcMain.on('click', (event, message, ...args) => {
-	if (message === 'selected-files') filesEditor();
-});
-
-function fileSelector () {
-	dialog.showOpenDialog({
-		title: 'Select files to share',
-		buttonLabel: 'Add files',
-		properties: ['openFile', 'multiSelections', 'showHiddenFiles', 'dontAddToRecent']
-	}).then(result => {
-		if(!result.canceled) result.filePaths.forEach(value => cli.files.push(value));
-		contents.send('update', cli);
-	});
-}
-
-function folderSelector () {
-	dialog.showOpenDialog({
-		title: 'Select folders to share',
-		buttonLabel: 'Add folders',
-		properties: ['openDirectory', 'multiSelections', 'showHiddenFiles', 'dontAddToRecent']
-	}).then(result => {
-		if(!result.canceled) result.filePaths.forEach(value => cli.files.push(value));
-		contents.send('update', cli);
-	});
-}
-
-function listSelector () {
-	dialog.showOpenDialog({
-		title: 'Select list file',
-		buttonLabel: 'Use this list',
-		properties: ['openFile', 'showHiddenFiles', 'dontAddToRecent']
-	}).then(result => {
-		if(!result.canceled) cli.list = result.filePaths[0];
-		else cli.list = '';
-		contents.send('update', cli);
-	});
-}
-
-function destSelector () {
-	dialog.showOpenDialog({
-		title: 'Select folder save to',
-		buttonLabel: 'Save here',
-		properties: ['openDirectory', 'showHiddenFiles', 'dontAddToRecent', 'createDirectory', 'promptToCreate']
-	}).then(result => {
-		if(!result.canceled) cli.dest = result.filePaths[0];
-		else cli.dest = path.resolve(__dirname, './uploads');
-		contents.send('update', cli);
-	});
-}
-
-function filesEditor () {
-	if(cli.files.length) {
-		let list = cli.files.map(value => value);
-		list.push('Cancel');
-		dialog.showMessageBox({
-			type: 'info',
-			title: 'Edit files to share',
-			message: 'Select the files you want to remove from share list',
-			buttons: list
-		}).then(action => {
-			if(action.response !== cli.files.length) {
-				cli.files.splice(action.response, 1);
-				contents.send('update', cli);
-				filesEditor();
-			}
-		});
-	}
-}
-
-function launchServer() {
-	contents.send('status', 'initiating');
-	require('./app')({
-		input: cli.files,
-		flags: {
-			destination: cli.dest,
-			list: cli.list,
-		}
-	}).then(createServer);
-}
-
-function createServer(app) {
-	contents.send('status', 'initiated');
-	server = http.createServer(app);
-	contents.send('status', 'created');
-	try {
-		server.listen(cli.port);
-		contents.send('status', 'binded');
-		const ni = os.networkInterfaces();
-		let addrs = [];
-		for (const iface in ni) {
-			const ip4 = ni[iface].find(iface => iface.family === 'IPv4');
-			if(!ip4.internal) addrs.push([iface, ip4.address]);
-		}
-		contents.send('address', addrs);
-	}
-	catch (err) {
-		if(err.code === 'EACCESS') contents.send('status', 'port-err');
-	}
-}
-
-function destroyServer() {
-	contents.send('status', 'closing');
-	server.close();
-	contents.send('status', 'closed');
-}
-
-function portSelector (message, port) {
-	cli.port = port;
-}
-
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -181,3 +51,143 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+let contents;
+let server;
+
+let cli = {
+	files: [],
+	list: '',
+	dest: app.getPath('downloads'),
+	port: 3000
+};
+
+ipcMain.on('input', (event, message, ...args) => {
+	if (message === 'file-select') shareSelector('file');
+	else if (message === 'folder-select') shareSelector('folder');
+	else if (message === 'list-select') listSelector();
+	else if (message === 'dest-select') destSelector();
+	else if (message === 'port') portSelector(message, ...args);
+	else if (message === 'start-server') launchServer();
+	else if (message === 'kill-server') destroyServer();
+});
+
+ipcMain.on('click', (event, message, ...args) => {
+	if (message === 'selected-files') filesEditor();
+});
+
+function shareSelector (type) {
+	let properties = ['multiSelections', 'showHiddenFiles', 'dontAddToRecent'];
+	let title, label;
+	if (type === 'file') {
+		properties.push('openFile');
+		title = 'Select files to share';
+		label: 'Add files'
+	}
+	else {
+		properties.push('openDirectory');
+		title = 'Select folders to share';
+		label = 'Add folders'
+	}
+	dialog.showOpenDialog({
+		title: title,
+		buttonLabel: label,
+		properties: properties
+	}).then(result => {
+		if(!result.canceled) result.filePaths.forEach(pushUnique);
+		contents.send('update', cli);
+	});
+}
+
+function pushUnique(item) {
+	if (cli.files.indexOf(item) === -1)
+		cli.files.push(item);
+}
+
+function listSelector () {
+	dialog.showOpenDialog({
+		title: 'Select list file',
+		buttonLabel: 'Use this list',
+		properties: ['openFile', 'showHiddenFiles', 'dontAddToRecent']
+	}).then(result => {
+		if(!result.canceled) cli.list = result.filePaths[0];
+		else cli.list = '';
+		contents.send('update', cli);
+	});
+}
+
+function destSelector () {
+	dialog.showOpenDialog({
+		title: 'Select folder save to',
+		buttonLabel: 'Save here',
+		properties: ['openDirectory', 'showHiddenFiles', 'dontAddToRecent', 'createDirectory', 'promptToCreate']
+	}).then(result => {
+		if(!result.canceled) cli.dest = result.filePaths[0];
+		else cli.dest = app.getPath('downloads');
+		contents.send('update', cli);
+	});
+}
+
+function filesEditor () {
+	if(cli.files.length) {
+		let list = cli.files.map(value => value);
+		list.push('Cancel');
+		dialog.showMessageBox({
+			type: 'info',
+			title: 'Edit files to share',
+			message: 'Select the files you want to remove from share list',
+			buttons: list
+		}).then(action => {
+			if(action.response !== cli.files.length) {
+				cli.files.splice(action.response, 1);
+				contents.send('update', cli);
+				filesEditor();
+			}
+		});
+	}
+}
+
+function launchServer() {
+	contents.send('status', 'initiating');
+	require('./app')({
+		input: cli.files,
+		flags: {
+			destination: cli.dest,
+			list: cli.list,
+		}
+	}).then(createServer);
+}
+
+function getAddresses() {
+	const ni = os.networkInterfaces();
+	let addresses = [];
+	for (const iface in ni) {
+		const ip4 = ni[iface].find(iface => iface.family === 'IPv4');
+		if(!ip4.internal) addresses.push([iface, ip4.address]);
+	}
+	return addresses
+}
+
+function createServer(app) {
+	contents.send('status', 'initiated');
+	server = http.createServer(app);
+	contents.send('status', 'created');
+	try {
+		server.listen(cli.port);
+		contents.send('status', 'binded');
+		contents.send('address', getAddresses());
+	}
+	catch (err) {
+		if(err.code === 'EACCESS') contents.send('status', 'port-err');
+	}
+}
+
+function destroyServer() {
+	contents.send('status', 'closing');
+	server.close();
+	contents.send('status', 'closed');
+}
+
+function portSelector(message, port) {
+	cli.port = port;
+}
