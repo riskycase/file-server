@@ -131,18 +131,19 @@ function destSelector () {
 function filesEditor () {
 	if(cli.files.length) {
 		let list = cli.files.map(value => value);
-		list.push('Cancel');
+		list.push('Done', 'Clear All');
 		dialog.showMessageBox({
 			type: 'info',
 			title: 'Edit files to share',
 			message: 'Select the files you want to remove from share list',
 			buttons: list
 		}).then(action => {
-			if(action.response !== cli.files.length) {
+			if(action.response < cli.files.length) {
 				cli.files.splice(action.response, 1);
-				contents.send('update', cli);
 				filesEditor();
 			}
+			else if(action.response === cli.files.length + 1) cli.files = [];
+			contents.send('update', cli);
 		});
 	}
 }
