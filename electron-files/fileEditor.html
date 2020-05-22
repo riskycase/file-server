@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Required meta tags-->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<!-- UIkit CSS-->
+		<link rel="stylesheet" href="../public/stylesheets/uikit.css">
+		<!-- UIkit JS-->
+		<script src="../public/scripts/uikit.js"></script>
+		<script src="../public/scripts/uikit-icons.js"></script>
+		
+		<title>Broadcast 'em - Control Panel</title>
+		<style>
+			@font-face {
+				font-family: 'Source Sans Pro';
+				src: local('SourceSansPro'), url('../public/fonts/SourceSansPro-Regular.ttf') format('truetype');
+			}
+
+			body {
+				font-family: 'Source Sans Pro';
+				height: 100vh;
+				overflow: hidden;
+				background: #333;
+			}
+		</style>
+	</head>
+	
+	<body>
+  
+		<header>
+			<div uk-sticky="animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky uk-navbar-transparent; cls-inactive: uk-navbar-transparent uk-light; top: 200">
+				<nav class="uk-navbar-container uk-background-primary uk-padding-small" uk-navbar>
+				
+					<div class="uk-navbar-left">
+						
+						<div class="uk-text-large" style="color: #fff">Currently sharing:<br>
+						<div class="uk-text-small">Click on an item to remove it from the list</div></div>
+						
+					</div>
+					
+					<div class="uk-navbar-right">
+						
+						<button id="clear-all" class="uk-button uk-button-default uk-margin-right-small" uk-tooltip="title: Clear all the selected files from the list; pos: bottom">Clear All</button>
+						
+						<button id="done" class="uk-button uk-button-default uk-margin-right-small" uk-tooltip="title: Return to main menu; pos: bottom">Done</button>
+						
+					</div>
+				</nav>
+			</div>
+		</header>
+		
+		<div id="list" class="uk-height-expand" style="height: calc(100vh - 87px);overflow: auto">
+		</div>
+		
+		<script src="./fileEditor.js"></script>
+	
+	</body>
+	
+</html>

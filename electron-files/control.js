@@ -71,8 +71,8 @@ ipcRenderer.on('update', (event, message) => {
 	else document.getElementById('selected-list').innerHTML = 'No list file selected!';
 	document.getElementById('port').innerHTML = message.port;
 	if(message.files.length) {
-		if(message.files.length === 1) document.getElementById('selected-files').innerHTML = '1 file selected. Click to view/edit.';
-		else document.getElementById('selected-files').innerHTML = message.files.length +' files selected. Click to view/edit.';
+		if(message.files.length === 1) document.getElementById('selected-files').innerHTML = '1 file selected. <u>Click to view/edit.</u>';
+		else document.getElementById('selected-files').innerHTML = message.files.length +' files selected. <u>Click to view/edit.</u>';
 	}
 	else document.getElementById('selected-files').innerHTML = 'No files selected';
 });
