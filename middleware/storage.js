@@ -39,7 +39,7 @@ function humanFileSize(bytes) {
 		bytes /= thresh;
 		++u;
 	}while(Math.abs(bytes) >= thresh);
-	return bytes.toFixed(0)+' '+units[u];
+	return bytes.toFixed(2)+' '+units[u];
 }
 
 /* Get unique elements only */
