@@ -5,7 +5,7 @@ function listClicked(index) {
 }
 
 ipcRenderer.on('list', (event, message) => {
-	document.getElementById('list').innerHTML = message.join('');
+	document.getElementById('list').innerHTML = message.join('\n');
 });
 
 document.getElementById('clear-all').addEventListener('click', () => {

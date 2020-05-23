@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const os = require('os');
 const http = require('http');
+const path = require('path');
 
 function createWindow () {
   // Create the browser window.
@@ -68,13 +69,38 @@ ipcMain.on('input', (event, message, ...args) => {
 	else if (message === 'list-select') listSelector();
 	else if (message === 'dest-select') destSelector();
 	else if (message === 'port') portSelector(message, ...args);
+	else if (message === 'clear-all') clearList();
+	else if (message === 'done') loadControl();
 	else if (message === 'start-server') launchServer();
 	else if (message === 'kill-server') destroyServer();
 });
 
-ipcMain.on('click', (event, message, ...args) => {
+ipcMain.on('click', (event, message) => {
 	if (message === 'selected-files') filesEditor();
 });
+
+ipcMain.on('list', (event, index) => {
+	cli.files.splice(index, 1);
+	if(cli.files.length) {
+		BrowserWindow.fromWebContents(contents).loadFile('electron-files/fileEditor.html');
+		contents.on('did-finish-load', () => {
+			contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
+		});
+	}
+	else loadControl();
+});
+
+function clearList() {
+	cli.files = [];
+	loadControl();
+}
+
+function loadControl() {
+	BrowserWindow.fromWebContents(contents).loadFile('electron-files/control.html');
+	contents.on('did-finish-load', () => {
+		contents.send('update', cli);
+	});
+}
 
 function shareSelector (type) {
 	let properties = ['multiSelections', 'showHiddenFiles', 'dontAddToRecent'];
@@ -130,20 +156,9 @@ function destSelector () {
 
 function filesEditor () {
 	if(cli.files.length) {
-		let list = cli.files.map(value => value);
-		list.push('Done', 'Clear All');
-		dialog.showMessageBox({
-			type: 'info',
-			title: 'Edit files to share',
-			message: 'Select the files you want to remove from share list',
-			buttons: list
-		}).then(action => {
-			if(action.response < cli.files.length) {
-				cli.files.splice(action.response, 1);
-				filesEditor();
-			}
-			else if(action.response === cli.files.length + 1) cli.files = [];
-			contents.send('update', cli);
+		BrowserWindow.fromWebContents(contents).loadFile('electron-files/fileEditor.html');
+		contents.on('did-finish-load', () => {
+			contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
 		});
 	}
 }
