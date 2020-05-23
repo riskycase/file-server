@@ -24,6 +24,7 @@ function createWindow () {
   
   contents.on('did-finish-load', () => {
     contents.send('update', cli);
+	contents.send('version', app.getVersion());
   });
 }
 
@@ -82,10 +83,7 @@ ipcMain.on('click', (event, message) => {
 ipcMain.on('list', (event, index) => {
 	cli.files.splice(index, 1);
 	if(cli.files.length) {
-		BrowserWindow.fromWebContents(contents).loadFile('electron-files/fileEditor.html');
-		contents.on('did-finish-load', () => {
-			contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
-		});
+		contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
 	}
 	else loadControl();
 });
@@ -99,6 +97,7 @@ function loadControl() {
 	BrowserWindow.fromWebContents(contents).loadFile('electron-files/control.html');
 	contents.on('did-finish-load', () => {
 		contents.send('update', cli);
+		contents.send('version', app.getVersion());
 	});
 }
 
