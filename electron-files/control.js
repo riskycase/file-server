@@ -65,6 +65,10 @@ ipcRenderer.on('address', (event, message) => {
 	document.getElementById('ip-address').innerHTML = message.map(value => value.join(': ') + ':' + document.getElementById('port').value).join('<br>');
 });
 
+ipcRenderer.on('version', (event, message) => {
+	document.getElementById('version').innerHTML = message;
+});
+
 ipcRenderer.on('update', (event, message) => {
 	document.getElementById('selected-dest').innerHTML = message.dest;
 	if(message.list !== '') document.getElementById('selected-list').innerHTML = message.list;
