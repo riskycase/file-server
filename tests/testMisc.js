@@ -11,7 +11,6 @@ describe('Miscalleneous tests', () => {
 
 	before(function (done){
 		fs.rmdirSync('dummy/uploads', {recursive:true});
-		process.env.NODE_ENV = 'development';
 		require('../app', {})({
 			input: [''],
 			flags: {destination: 'dummy/uploads', list: ''}
