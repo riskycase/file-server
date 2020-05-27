@@ -8,7 +8,6 @@ function createWindow () {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: 'icon.png',
     resizable: false,
     fullscreenable: false,
     webPreferences: {
@@ -19,13 +18,8 @@ function createWindow () {
   contents = win.webContents;
   
   win.setMenuBarVisibility(false);
-  // and load the index.html of the app.
-  win.loadFile('electron-files/control.html');
   
-  contents.on('did-finish-load', () => {
-    contents.send('update', cli);
-	contents.send('version', app.getVersion());
-  });
+  loadControl();
 }
 
 // This method will be called when Electron has finished
@@ -82,9 +76,7 @@ ipcMain.on('click', (event, message) => {
 
 ipcMain.on('list', (event, index) => {
 	cli.files.splice(index, 1);
-	if(cli.files.length) {
-		contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
-	}
+	if(cli.files.length) createCards();
 	else loadControl();
 });
 
@@ -157,7 +149,7 @@ function filesEditor () {
 	if(cli.files.length) {
 		BrowserWindow.fromWebContents(contents).loadFile('electron-files/fileEditor.html');
 		contents.on('did-finish-load', () => {
-			contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
+			createCards();
 		});
 	}
 }
@@ -205,4 +197,8 @@ function destroyServer() {
 
 function portSelector(message, port) {
 	cli.port = port;
+}
+
+function createCards(value,index) {
+	contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
 }

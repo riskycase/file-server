@@ -53,7 +53,6 @@ function testInvalidDownload (done, index) {
 describe('When sharing from a list', () => {
 
 	before(function (done){
-		process.env.NODE_ENV = 'test';
 		require('../app')({
 			input: [],
 			flags: {destination: 'dummy/uploads', list: 'dummy/dummy-list.txt'}

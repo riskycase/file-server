@@ -14,7 +14,6 @@ var app;
 describe('When not sharing anything', () => {
 
 	before(function (done){
-		process.env.NODE_ENV = 'test';
 		require('../app')({
 			input: [],
 			flags: {destination: 'dummy/uploads', list: ''}
