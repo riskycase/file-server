@@ -53,7 +53,6 @@ function testInvalidDownload (done, index) {
 describe('When sharing with repititions', () => {
 
 	before(function (done){
-		process.env.NODE_ENV = 'test';
 		require('../app')({
 			input: ['dummy/dummy-down.txt'],
 			flags: {destination: 'dummy/uploads', list: 'dummy/dummy-list-long.txt'}

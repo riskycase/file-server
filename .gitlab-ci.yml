@@ -1,21 +1,43 @@
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: SAST.gitlab-ci.yml
+  - template: License-Scanning.gitlab-ci.yml
+
 image: node:latest
 
 stages:
-  - test
+  - checks
   - build
+  - test
 
 cache:
   paths:
     - node_modules/
-
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
+    
 Test:
-  stage: test
+  stage: checks
   script:
     - yarn install
     - yarn test
 
-Build:
+Build Linux:
+  image: electronuserland/builder:latest
   stage: build
   script:
     - yarn install
-    - yarn build
+    - yarn build --linux AppImage --x64
+  artifacts:
+    paths:
+      - dist/broadcast-em-*
+
+Build Winodws:
+  image: electronuserland/builder:wine
+  stage: build
+  script:
+    - yarn install
+    - yarn build --windows portable --x64
+  artifacts:
+    paths:
+      - dist/broadcast-em-*

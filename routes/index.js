@@ -20,9 +20,4 @@ router.post('/', storage.saveFiles , (req, res, next) => {
 	res.send(files);
 });
 
-module.exports = async function(cli) {
-	
-	await storage.init(cli);
-	return router;
-
-};
+module.exports = router;
