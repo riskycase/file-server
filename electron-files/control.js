@@ -45,6 +45,9 @@ ipcRenderer.on('status', (event, message) => {
 	else if(message === 'port-err') {
 		document.getElementById('message').innerHTML = 'Can\'t use the selected port, try changing port or run with elevated permissions';
 	}
+	else if(message === 'port-used') {
+		document.getElementById('message').innerHTML = 'The selected port is already being used by another process';
+	}
 	else if(message === 'binded') {
 		document.getElementById('message').innerHTML = 'Server ready';
 		document.getElementById('start-server').style.display = 'none';

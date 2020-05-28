@@ -90,6 +90,7 @@ function loadControl() {
 	contents.on('did-finish-load', () => {
 		contents.send('update', cli);
 		contents.send('version', app.getVersion());
+		if(server && server.listening) serverListening();
 	});
 }
 
@@ -179,14 +180,19 @@ function createServer(app) {
 	contents.send('status', 'initiated');
 	server = http.createServer(app);
 	contents.send('status', 'created');
-	try {
-		server.listen(cli.port);
-		contents.send('status', 'binded');
-		contents.send('address', getAddresses());
-	}
-	catch (err) {
-		if(err.code === 'EACCESS') contents.send('status', 'port-err');
-	}
+	server.listen(cli.port);
+	server.on('listening', serverListening);
+	server.on('error', serverErrored);
+}
+
+function serverListening() {
+	contents.send('status', 'binded');
+	contents.send('address', getAddresses());
+}
+
+function serverErrored(err) {
+	if(err.code === 'EADDRINUSE') contents.send('status', 'port-used');
+	if(err.code === 'EACCES') contents.send('status', 'port-err');
 }
 
 function destroyServer() {
