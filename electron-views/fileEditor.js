@@ -4,6 +4,10 @@ function listClicked(index) {
 	ipcRenderer.send('list', index);
 }
 
+function removeClicked(index) {
+	ipcRenderer.send('remove', index);
+}
+
 ipcRenderer.on('list', (event, message) => {
 	document.getElementById('list').innerHTML = message.join('\n');
 });

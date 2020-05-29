@@ -11,7 +11,7 @@ describe('Miscalleneous tests', () => {
 
 	before(function (done){
 		fs.rmdirSync('dummy/uploads', {recursive:true});
-		require('../app', {})({
+		require('../server/app', {})({
 			input: [''],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
@@ -40,7 +40,7 @@ describe('Miscalleneous tests', () => {
 	});
 	
 	after(function(done) {
-		delete require.cache[require.resolve('../app')];
+		delete require.cache[require.resolve('../server/app')];
 		done();
 	});
 	

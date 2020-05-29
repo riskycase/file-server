@@ -32,6 +32,10 @@ document.getElementById('kill-server').addEventListener('click', () => {
 	ipcRenderer.send('input', 'kill-server');
 });
 
+document.getElementById('version').addEventListener('click', () => {
+	ipcRenderer.send('input', 'version');
+});
+
 ipcRenderer.on('status', (event, message) => {
 	if(message === 'initiating') {
 		document.getElementById('message').innerHTML = 'Creating server configuration';
@@ -82,5 +86,7 @@ ipcRenderer.on('update', (event, message) => {
 		else document.getElementById('selected-files').innerHTML = message.files.length +' files selected. <u>Click to view/edit.</u>';
 	}
 	else document.getElementById('selected-files').innerHTML = 'No files selected';
+	if(message.version === 'latest') document.getElementById('version').setAttribute("uk-tooltip","Latest version");
+	else if(message.version === 'old') document.getElementById('version').setAttribute("uk-tooltip","Newer version available, click to view");
 });
 
