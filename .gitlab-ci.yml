@@ -2,14 +2,13 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
   - template: SAST.gitlab-ci.yml
   - template: License-Scanning.gitlab-ci.yml
-  - template: Code-Quality.gitlab-ci.yml
 
 image: node:latest
 
 stages:
+  - test
   - checks
   - build
-  - test
 
 cache:
   paths:
