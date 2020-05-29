@@ -6,9 +6,9 @@ include:
 image: node:latest
 
 stages:
+  - test
   - checks
   - build
-  - test
 
 cache:
   paths:
@@ -31,6 +31,7 @@ Build Linux:
   artifacts:
     paths:
       - dist/broadcast-em-*
+    expire_in: 6h
 
 Build Winodws:
   image: electronuserland/builder:wine
@@ -41,3 +42,4 @@ Build Winodws:
   artifacts:
     paths:
       - dist/broadcast-em-*
+    expire_in: 6h

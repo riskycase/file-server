@@ -14,7 +14,7 @@ var app;
 describe('When not sharing anything', () => {
 
 	before(function (done){
-		require('../app')({
+		require('../server/app')({
 			input: [],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
@@ -119,7 +119,7 @@ describe('When not sharing anything', () => {
 	});
 	
 	after(function(done) {
-		delete require.cache[require.resolve('../app')];
+		delete require.cache[require.resolve('../server/app')];
 		done();
 	});
 	

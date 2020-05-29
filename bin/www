@@ -49,7 +49,7 @@ const cli = meow(`
  * Start Express app from the CLI flags
  */
 
-require('../app')(cli).then((app) =>{
+require('../server/app')(cli).then((app) =>{
 
 	/**
 	 * Get port from environment and store in Express.
