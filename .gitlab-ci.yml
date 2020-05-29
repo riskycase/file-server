@@ -2,6 +2,7 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
   - template: SAST.gitlab-ci.yml
   - template: License-Scanning.gitlab-ci.yml
+  - template: Code-Quality.gitlab-ci.yml
 
 image: node:latest
 
@@ -31,6 +32,7 @@ Build Linux:
   artifacts:
     paths:
       - dist/broadcast-em-*
+    expire_in: 6h
 
 Build Winodws:
   image: electronuserland/builder:wine
@@ -41,3 +43,4 @@ Build Winodws:
   artifacts:
     paths:
       - dist/broadcast-em-*
+    expire_in: 6h
