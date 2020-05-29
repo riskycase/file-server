@@ -1,3 +1,9 @@
+v1.2.0
+
+Tweaked the editor UI to view the files on the host machine
+Hovering over the app version shows if the app is latest
+If not latest version, clicking on app version opens releases page
+
 v1.1.5
 
 Graceful handling of errors

@@ -14,7 +14,7 @@
 		<style>
 			@font-face {
 				font-family: 'Source Sans Pro';
-				src: local('SourceSansPro'), url('../public/fonts/SourceSansPro-Regular.ttf') format('truetype');
+				src: local('SourceSansPro'), url('../server/public/fonts/SourceSansPro-Regular.ttf') format('truetype');
 			}
 
 			body {
@@ -102,7 +102,7 @@
 			
 		</div>
 		
-		<span class="uk-flex uk-flex-right" style="position: absolute; bottom: 10px; width: calc(100vw - 10px)">v<u id="version">1.0.0</u></span>
+		<span class="uk-flex uk-flex-right" style="position: absolute; bottom: 10px; width: calc(100vw - 10px)">v<a id="version" onclick="openReleases()">1.0.0</a></span>
 		
 		<script src="./control.js"></script>
 		

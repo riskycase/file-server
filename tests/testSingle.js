@@ -53,7 +53,7 @@ function testInvalidDownload (done, index) {
 describe('When sharing a single file', () => {
 
 	before(function (done){
-		require('../app')({
+		require('../server/app')({
 			input: ['dummy/dummy-down.txt'],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
@@ -129,7 +129,7 @@ describe('When sharing a single file', () => {
 	it('it should download a zip with name allFiles.zip', downloadAllTest);
 	
 	after(function(done) {
-		delete require.cache[require.resolve('../app')];
+		delete require.cache[require.resolve('../server/app')];
 		done();
 	});
 	

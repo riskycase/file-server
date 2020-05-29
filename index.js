@@ -1,25 +1,34 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const os = require('os');
 const http = require('http');
 const path = require('path');
 
 function createWindow () {
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    resizable: false,
-    fullscreenable: false,
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
-  
-  contents = win.webContents;
-  
-  win.setMenuBarVisibility(false);
-  
-  loadControl();
+	// Create the browser window.
+	const win = new BrowserWindow({
+		width: 800,
+		height: 600,
+		resizable: false,
+		fullscreenable: false,
+		webPreferences: {
+			nodeIntegration: true
+		}
+	});
+	
+	contents = win.webContents;
+	
+	win.setMenuBarVisibility(false);
+	
+	loadControl();
+	require('https').get('https://raw.githubusercontent.com/riskycase/file-server/deploy/package.json', (res) => {
+		res.setEncoding('utf8');
+		let body = '';
+		res.on('data', (chunk) => { body += chunk; });
+		res.on('end', () => {
+			if(JSON.parse(body).version === app.getVersion()) options.version = 'latest';
+			else options.version = 'old';
+		});
+	});
 }
 
 // This method will be called when Electron has finished
@@ -29,19 +38,19 @@ app.whenReady().then(createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+	// On macOS it is common for applications and their menu bar
+	// to stay active until the user quits explicitly with Cmd + Q
+	if (process.platform !== 'darwin') {
 	if(server && server.listening) server.close();
-    app.quit();
+	app.quit();
   }
 });
 
 app.on('activate', () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+	// On macOS it's common to re-create a window in the app when the
+	// dock icon is clicked and there are no other windows open.
+	if (BrowserWindow.getAllWindows().length === 0) {
+		createWindow();
   }
 });
 
@@ -51,11 +60,12 @@ app.on('activate', () => {
 let contents;
 let server;
 
-let cli = {
+let options = {
 	files: [],
 	list: '',
 	dest: app.getPath('downloads'),
-	port: 3000
+	port: 3000,
+	version: 'unchecked'
 };
 
 ipcMain.on('input', (event, message, ...args) => {
@@ -66,6 +76,7 @@ ipcMain.on('input', (event, message, ...args) => {
 	else if (message === 'port') portSelector(message, ...args);
 	else if (message === 'clear-all') clearList();
 	else if (message === 'done') loadControl();
+	else if (message === 'version' && options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
 	else if (message === 'start-server') launchServer();
 	else if (message === 'kill-server') destroyServer();
 });
@@ -74,21 +85,25 @@ ipcMain.on('click', (event, message) => {
 	if (message === 'selected-files') filesEditor();
 });
 
-ipcMain.on('list', (event, index) => {
-	cli.files.splice(index, 1);
-	if(cli.files.length) createCards();
+ipcMain.on('remove', (event, index) => {
+	options.files.splice(index, 1);
+	if(options.files.length) createCards();
 	else loadControl();
 });
 
+ipcMain.on('list', (event, index) => {
+	shell.openPath(options.files[index]);
+});
+
 function clearList() {
-	cli.files = [];
+	options.files = [];
 	loadControl();
 }
 
 function loadControl() {
-	BrowserWindow.fromWebContents(contents).loadFile('electron-files/control.html');
+	BrowserWindow.fromWebContents(contents).loadFile('electron-views/control.html');
 	contents.on('did-finish-load', () => {
-		contents.send('update', cli);
+		contents.send('update', options);
 		contents.send('version', app.getVersion());
 		if(server && server.listening) serverListening();
 	});
@@ -113,13 +128,13 @@ function shareSelector (type) {
 		properties: properties
 	}).then(result => {
 		if(!result.canceled) result.filePaths.forEach(pushUnique);
-		contents.send('update', cli);
+		contents.send('update', options);
 	});
 }
 
 function pushUnique(item) {
-	if (cli.files.indexOf(item) === -1)
-		cli.files.push(item);
+	if (options.files.indexOf(item) === -1)
+		options.files.push(item);
 }
 
 function listSelector () {
@@ -128,9 +143,9 @@ function listSelector () {
 		buttonLabel: 'Use this list',
 		properties: ['openFile', 'showHiddenFiles', 'dontAddToRecent']
 	}).then(result => {
-		if(!result.canceled) cli.list = result.filePaths[0];
-		else cli.list = '';
-		contents.send('update', cli);
+		if(!result.canceled) options.list = result.filePaths[0];
+		else options.list = '';
+		contents.send('update', options);
 	});
 }
 
@@ -140,15 +155,15 @@ function destSelector () {
 		buttonLabel: 'Save here',
 		properties: ['openDirectory', 'showHiddenFiles', 'dontAddToRecent', 'createDirectory', 'promptToCreate']
 	}).then(result => {
-		if(!result.canceled) cli.dest = result.filePaths[0];
-		else cli.dest = app.getPath('downloads');
-		contents.send('update', cli);
+		if(!result.canceled) options.dest = result.filePaths[0];
+		else options.dest = app.getPath('downloads');
+		contents.send('update', options);
 	});
 }
 
 function filesEditor () {
-	if(cli.files.length) {
-		BrowserWindow.fromWebContents(contents).loadFile('electron-files/fileEditor.html');
+	if(options.files.length) {
+		BrowserWindow.fromWebContents(contents).loadFile('electron-views/fileEditor.html');
 		contents.on('did-finish-load', () => {
 			createCards();
 		});
@@ -157,11 +172,11 @@ function filesEditor () {
 
 function launchServer() {
 	contents.send('status', 'initiating');
-	require('./app')({
-		input: cli.files,
+	require('./server/app')({
+		input: options.files,
 		flags: {
-			destination: cli.dest,
-			list: cli.list,
+			destination: options.dest,
+			list: options.list,
 		}
 	}).then(createServer);
 }
@@ -180,7 +195,7 @@ function createServer(app) {
 	contents.send('status', 'initiated');
 	server = http.createServer(app);
 	contents.send('status', 'created');
-	server.listen(cli.port);
+	server.listen(options.port);
 	server.on('listening', serverListening);
 	server.on('error', serverErrored);
 }
@@ -202,9 +217,9 @@ function destroyServer() {
 }
 
 function portSelector(message, port) {
-	cli.port = port;
+	options.port = port;
 }
 
 function createCards(value,index) {
-	contents.send('list', cli.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" onclick="listClicked('+index+')"><h3>'+path.basename(value)+'</h3><span class="uk-text-small">'+value+'</span></div>'));
+	contents.send('list', options.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" style="height: 90px"><div class="uk-float uk-float-left" onclick="listClicked('+index+')"><span class="uk-text-large">'+path.basename(value)+'</span><br><span class="uk-text-small">'+value+'</span></div><div class="uk-float uk-float-right" onclick="removeClicked('+index+')"><a>Remove</a></div></div>'));
 }
