@@ -5,7 +5,9 @@ let server;
 let contents;
 let options;
 
-module.exports.killServer = destroyServer;
+module.exports.killServer = killServer;
+
+module.exports.destroyServer = destroyServer;
 
 module.exports.launchServer = function (receivedContents = contents, receivedOptions = options) {
 	contents = receivedContents;
@@ -53,9 +55,13 @@ function serverErrored(err) {
 	if(err.code === 'EACCES') contents.send('status', 'port-err');
 }
 
+function killServer() {
+	if(server && server.listening)
+		server.close();	
+}
+
 function destroyServer() {
 	contents.send('status', 'closing');	
-	if(server && server.listening)
-		server.close();
+	killServer();
 	contents.send('status', 'closed');
 }

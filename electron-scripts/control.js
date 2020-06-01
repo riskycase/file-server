@@ -6,12 +6,42 @@ const server = require('./server.js');
 
 let contents;
 
-let options = {
-	files: [],
-	list: '',
-	dest: app.getPath('downloads'),
-	port: 3000,
-	version: 'unchecked'
+const options = {
+	_files: [],
+	get files() {
+		return this._files;
+	},
+	set files(files) {
+		this._files = files;
+	},
+	_list: '',
+	get list() {
+		return this._list;
+	},
+	set list(list) {
+		this._list = list;
+	},
+	_dest: app.getPath('downloads'),
+	get dest() {
+		return this._dest;
+	},
+	set dest(dest) {
+		this._dest = dest;
+	},
+	_port: 3000,
+	get port() {
+		return this._port;
+	},
+	set port(port) {
+		this._port = port;
+	},
+	_version: 'unchecked',
+	get version() {
+		return this._version;
+	},
+	set version(version) {
+		this._version = version;
+	}
 };
 
 //Check for the latest version
@@ -43,7 +73,7 @@ ipcMain.on('input', (event, message, ...args) => {
 	else if (message === 'port') portSelector(message, ...args);
 	else if (message === 'version' && options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
 	else if (message === 'start-server') server.launchServer(contents, options);
-	else if (message === 'kill-server') server.killServer();
+	else if (message === 'kill-server') server.destroyServer();
 });
 
 ipcMain.on('click', (event, message) => {
