@@ -1,12 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
-const os = require('os');
-const http = require('http');
 const path = require('path');
 
 const fileEditor = require('./fileEditor.js');
+const server = require('./server.js');
 
 let contents;
-let server;
 
 let options = {
 	files: [],
@@ -33,11 +31,9 @@ module.exports.loadControl = function (receivedContents = contents) {
 	contents.on('did-finish-load', () => {
 		contents.send('update', options);
 		contents.send('version', app.getVersion());
-		if(server && server.listening) serverListening();
+		if(server.isServerListening) server.serverListening();
 	});
 }
-
-module.exports.killServer = destroyServer;
 
 ipcMain.on('input', (event, message, ...args) => {
 	if (message === 'file-select') shareSelector('file');
@@ -46,8 +42,8 @@ ipcMain.on('input', (event, message, ...args) => {
 	else if (message === 'dest-select') destSelector();
 	else if (message === 'port') portSelector(message, ...args);
 	else if (message === 'version' && options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
-	else if (message === 'start-server') launchServer();
-	else if (message === 'kill-server') destroyServer();
+	else if (message === 'start-server') server.launchServer(contents, options);
+	else if (message === 'kill-server') server.killServer();
 });
 
 ipcMain.on('click', (event, message) => {
@@ -104,53 +100,6 @@ function destSelector () {
 		else options.dest = app.getPath('downloads');
 		contents.send('update', options);
 	});
-}
-
-function launchServer() {
-	contents.send('status', 'initiating');
-	require('./server/app')({
-		input: options.files,
-		flags: {
-			destination: options.dest,
-			list: options.list,
-		}
-	}).then(createServer);
-}
-
-function getAddresses() {
-	const ni = os.networkInterfaces();
-	let addresses = [];
-	for (const iface in ni) {
-		const ip4 = ni[iface].find(iface => iface.family === 'IPv4');
-		if(!ip4.internal) addresses.push([iface, ip4.address]);
-	}
-	return addresses;
-}
-
-function createServer(app) {
-	contents.send('status', 'initiated');
-	server = http.createServer(app);
-	contents.send('status', 'created');
-	server.listen(options.port);
-	server.on('listening', serverListening);
-	server.on('error', serverErrored);
-}
-
-function serverListening() {
-	contents.send('status', 'binded');
-	contents.send('address', getAddresses());
-}
-
-function serverErrored(err) {
-	if(err.code === 'EADDRINUSE') contents.send('status', 'port-used');
-	if(err.code === 'EACCES') contents.send('status', 'port-err');
-}
-
-function destroyServer() {
-	contents.send('status', 'closing');	
-	if(server && server.listening)
-		server.close();
-	contents.send('status', 'closed');
 }
 
 function portSelector(message, port) {

@@ -1,9 +1,7 @@
 const { app, BrowserWindow } = require('electron');
-const os = require('os');
-const http = require('http');
-const path = require('path');
 
 const control = require('./electron-scripts/control.js');
+const server = require('./electron-scripts/server.js');
 
 function createWindow () {
 	// Create the browser window.
@@ -34,7 +32,7 @@ app.on('window-all-closed', () => {
 	// On macOS it is common for applications and their menu bar
 	// to stay active until the user quits explicitly with Cmd + Q
 	if (process.platform !== 'darwin') {
-		control.killServer();
+		server.killServer();
 		app.quit();
 	}
 });
