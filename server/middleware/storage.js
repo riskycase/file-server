@@ -4,9 +4,8 @@ const nfu = require('nodejs-fs-utils');
 const multer = require('multer');
 const path = require('path');
 	
-let files = [];
-let rows = [];
-let index = 0;
+let sharedFiles = [];
+let receivedFiles = [];
 let destination;
 const icons = [
 	['image','jpg|jpeg|png|dng|bmp|tiff'],
@@ -17,19 +16,19 @@ const icons = [
 ];
 
 // Form the row object that will be inserted into the view
-const formObject = (filePath, index) => ({
-	'name': path.basename(filePath),
-	'icon': fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory() ? 'folder' : getIcon(path.extname(filePath).substring(path.extname(filePath).indexOf('.') + 1)),
-	'size': humanFileSize(nfu.fsizeSync(filePath)),
-	'index': index++
+const formRow = (file, index) => ({
+	'name': path.basename(file.path),
+	'icon': file.folder ? 'folder' : getIcon(path.extname(file.path).substring(path.extname(file.path).indexOf('.') + 1)),
+	'size': !file.size ? 'Calculating size' : humanFileSize(file.size),
+	'index': index
 });
 
-// Get the icon of the file/folder given filePath
+// Get the icon of the file/folder given file path
 const getIcon = (ext) => icons.find((value) => ext.match(value[1]))[0];
 
 /* Convert file size to human readable */
 function humanFileSize(bytes) {
-	const thresh = 1000;
+	const thresh = 1024;
 	if(Math.abs(bytes) < thresh) {
 		return bytes + ' B';
 	}
@@ -43,7 +42,9 @@ function humanFileSize(bytes) {
 }
 
 /* Get unique elements only */
-const onlyUnique = (value, index, self) => self.indexOf(value) === index;
+function isPathPresent(arr, path) {
+	return arr.find(value => value.path === path);
+}
 
 // SET STORAGE
 const storage = multer.diskStorage({
@@ -63,18 +64,27 @@ async function readLines(listPath) {
 	});
 
 	for await (const line of readInterface) {
-		if( files.indexOf(line) === -1 ) {
-			files.push(line);
+		if( !isPathPresent(sharedFiles, line) ) {
+			sharedFiles.push(fileMaker(line));
 		}
 	}
 
+}
+
+function fileMaker(path) {
+	return {path:path, size: undefined, folder: undefined}
+}
+
+function calcSize(file) {
+	nfu.fsize(file.path, (err, size) => file.size = size);
+	file.folder = fs.existsSync(file.path) && fs.lstatSync(file.path).isDirectory();
 }
 
 const upload = multer({ storage: storage });
 
 module.exports.init = async function(cli) {
 	
-	files = cli.input.filter(onlyUnique);
+	sharedFiles = cli.input.filter((value, index, self) => self.indexOf(value) === index).map(fileMaker);
 	destination = cli.flags.destination;
 	
 	fs.access(destination, fs.constants.F_OK, (err) => {
@@ -83,31 +93,26 @@ module.exports.init = async function(cli) {
 	});
 	
 	if(cli.flags.list !== '') await readLines(cli.flags.list);
-
-	files = files.filter(onlyUnique);		
-	rows = files.map(formObject);
-
+	
+	sharedFiles.forEach(calcSize);
+	
+	receivedFiles = [];
+	
 };
 
-module.exports.getRows = () => rows;
+module.exports.getRows = () => sharedFiles.concat(receivedFiles).map(formRow);
 
-module.exports.getPaths = () => files;
+module.exports.getPaths = () => sharedFiles.concat(receivedFiles).map(fileObject => fileObject.path);
 
-module.exports.isFolder = (index) => rows[index].icon === 'folder';
+module.exports.isFolder = (index) => sharedFiles.concat(receivedFiles)[index].folder;
 
 module.exports.saveFiles = upload.array('files[]');
 
 module.exports.updateRows = function(uploadedFiles) {
 	
 	uploadedFiles.forEach(function (value) {
-		if ( files.indexOf(value.path) === -1 ) {
-			files.push(value.path);
-			rows.push({
-				'name': value.filename,
-				'icon': getIcon(path.extname(value.filename).substring(path.extname(value.filename).indexOf('.') + 1)),
-				'size': humanFileSize(value.size),
-				'index': index++
-			});
+		if ( !isPathPresent(receivedFiles, value.path) ) {
+			receivedFiles.push({path: value.path, size: value.size, folder: false});
 		}
 	});
 	

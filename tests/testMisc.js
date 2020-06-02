@@ -12,7 +12,7 @@ describe('Miscalleneous tests', () => {
 	before(function (done){
 		fs.rmdirSync('dummy/uploads', {recursive:true});
 		require('../server/app', {})({
-			input: [''],
+			input: [],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
 		.then((generatedApp) => {
