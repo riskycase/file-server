@@ -5,6 +5,7 @@ const fileEditor = require('./fileEditor.js');
 const server = require('./server.js');
 
 let contents;
+let refreshNeeded = false;
 
 const options = {
 	_files: [],
@@ -20,6 +21,7 @@ const options = {
 	},
 	set list(list) {
 		this._list = list;
+		optionsChanged();
 	},
 	_dest: app.getPath('downloads'),
 	get dest() {
@@ -27,6 +29,7 @@ const options = {
 	},
 	set dest(dest) {
 		this._dest = dest;
+		optionsChanged();
 	},
 	_port: 3000,
 	get port() {
@@ -55,13 +58,16 @@ require('https').get('https://raw.githubusercontent.com/riskycase/file-server/de
 	});
 });
 
+module.exports.refreshNeeded = () => refreshNeeded = true;
+
 module.exports.loadControl = function (receivedContents = contents) {
 	contents = receivedContents;
 	BrowserWindow.fromWebContents(contents).loadFile(path.resolve(__dirname, '../electron-views/control.html'));
 	contents.on('did-finish-load', () => {
 		contents.send('update', options);
 		contents.send('version', app.getVersion());
-		if(server.isServerListening) server.serverListening();
+		if(server.isServerListening()) server.serverListening();
+		if(refreshNeeded) optionsChanged();
 	});
 }
 
@@ -74,11 +80,17 @@ ipcMain.on('input', (event, message, ...args) => {
 	else if (message === 'version' && options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
 	else if (message === 'start-server') server.launchServer(contents, options);
 	else if (message === 'kill-server') server.destroyServer();
+	else if (message === 'refresh-server') server.refreshServer(options);
 });
 
 ipcMain.on('click', (event, message) => {
 	if (message === 'selected-files') fileEditor.loadFileEditor(contents, options);
 });
+
+function optionsChanged() {
+	if(server.isServerListening()) contents.send('refresh', 'needed');
+	refreshNeeded = false;
+}
 
 function shareSelector (type) {
 	let properties = ['multiSelections', 'showHiddenFiles', 'dontAddToRecent'];
@@ -98,14 +110,18 @@ function shareSelector (type) {
 		buttonLabel: label,
 		properties: properties
 	}).then(result => {
-		if(!result.canceled) result.filePaths.forEach(pushUnique);
+		if(!result.canceled) {
+			result.filePaths.forEach(pushUnique);
+		}
 		contents.send('update', options);
 	});
 }
 
 function pushUnique(item) {
-	if (options.files.indexOf(item) === -1)
+	if (options.files.indexOf(item) === -1) {
 		options.files.push(item);
+		optionsChanged();
+	}
 }
 
 function listSelector () {

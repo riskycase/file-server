@@ -13,6 +13,7 @@ ipcMain.on('input', (event, message, ...args) => {
 
 ipcMain.on('remove', (event, index) => {
 	options.files.splice(index, 1);
+	control.refreshNeeded();
 	if(options.files.length) createCards();
 	else control.loadControl();
 });
@@ -23,6 +24,7 @@ ipcMain.on('list', (event, index) => {
 
 function clearList() {
 	options.files = [];
+	control.refreshNeeded();
 	control.loadControl();
 }
 
@@ -38,5 +40,16 @@ module.exports.loadFileEditor = function (receivedContents = contents, receivedO
 }
 
 function createCards(value,index) {
-	contents.send('list', options.files.map((value, index) => '<div class="uk-card uk-padding-small uk-card-secondary" style="height: 90px"><div class="uk-float uk-float-left" onclick="listClicked('+index+')"><span class="uk-text-large">'+path.basename(value)+'</span><br><span class="uk-text-small">'+value+'</span></div><div class="uk-float uk-float-right" onclick="removeClicked('+index+')"><a>Remove</a></div></div>'));
+	contents.send('list', options.files.map((value, index) => `
+		<div class="uk-card uk-padding-small uk-card-secondary" style="height: 90px">
+			<div class="uk-float uk-float-left" onclick="listClicked(${index})">
+				<span class="uk-text-large">${path.basename(value)}</span>
+				<br>
+				<span class="uk-text-small">${value}</span>
+			</div>
+			<div class="uk-float uk-float-right" onclick="removeClicked(${index})">
+				<a>Remove</a>
+			</div>
+		</div>
+	`));
 }

@@ -35,7 +35,25 @@
 			}
 			
 			.uk-button-success:active {
-				background-color: #1e8235;
+				background-color: #1d7f34;
+				color: #fff;
+				border: 1px solid transparent;
+			}
+			
+			.uk-button-info {
+				background-color: #3399ff;
+				color: #fff;
+				border: 1px solid transparent;
+			}
+			
+			.uk-button-info:hover, uk-button-info:focus {
+				background-color: #1b8dff;
+				color: #fff;
+				border: 1px solid transparent;
+			}
+			
+			.uk-button-info:active {
+				background-color: #007ffe;
 				color: #fff;
 				border: 1px solid transparent;
 			}
@@ -94,8 +112,11 @@
 				
 				<button id="start-server" class="uk-button uk-button-success">Start Server</button>
 				<button id="kill-server" class="uk-button uk-button-danger" style="display: none">Kill Server</button>
+				<button id="refresh-server" class="uk-button uk-button-info" style="display: none">Refresh Server</button>
+				
+				<span id="server-refresh" style="display: none">Options have been modified, refresh server to apply these changes</span>
 
-				<span id="message"></span>
+				<div id="message"></div>
 				<div id="ip-address" uk-tooltip="title: Enter this address into the URL bar of the browser in the device connected to respective network"></div>
 
 			</div>

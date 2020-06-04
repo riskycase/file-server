@@ -9,6 +9,17 @@ module.exports.killServer = killServer;
 
 module.exports.destroyServer = destroyServer;
 
+module.exports.refreshServer = function (options) {
+	require('../server/middleware/storage').init({
+		input: options.files,
+		flags: {
+			destination: options.dest,
+			list: options.list,
+		}
+	});
+	contents.send('refresh', 'done');
+}
+
 module.exports.launchServer = function (receivedContents = contents, receivedOptions = options) {
 	contents = receivedContents;
 	options = receivedOptions;
@@ -22,7 +33,9 @@ module.exports.launchServer = function (receivedContents = contents, receivedOpt
 	}).then(createServer);
 }
 
-module.exports.isServerLisenting = server && server.listening;
+module.exports.isServerListening = function () {
+	return server ? server.listening : false;
+}
 
 module.exports.serverListening = serverListening;
 

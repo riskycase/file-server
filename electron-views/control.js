@@ -32,6 +32,10 @@ document.getElementById('kill-server').addEventListener('click', () => {
 	ipcRenderer.send('input', 'kill-server');
 });
 
+document.getElementById('refresh-server').addEventListener('click', () => {
+	ipcRenderer.send('input', 'refresh-server');
+});
+
 document.getElementById('version').addEventListener('click', () => {
 	ipcRenderer.send('input', 'version');
 });
@@ -65,6 +69,8 @@ ipcRenderer.on('status', (event, message) => {
 		document.getElementById('ip-address').innerHTML = '';
 		document.getElementById('start-server').style.display = 'inline-block';
 		document.getElementById('kill-server').style.display = 'none';
+		document.getElementById('refresh-server').style.display = 'none';
+		document.getElementById('server-refresh').style.display = 'none';
 	}
 });
 
@@ -90,3 +96,13 @@ ipcRenderer.on('update', (event, message) => {
 	else if(message.version === 'old') document.getElementById('version').setAttribute("uk-tooltip","Newer version available, click to view");
 });
 
+ipcRenderer.on('refresh', (event, message) => {
+	if(message === 'needed') {
+		document.getElementById('refresh-server').style.display = 'inline-block';
+		document.getElementById('server-refresh').style.display = 'inline-block';
+	}
+	else if(message === 'done') {
+		document.getElementById('refresh-server').style.display = 'none';
+		document.getElementById('server-refresh').style.display = 'none';
+	}
+});
