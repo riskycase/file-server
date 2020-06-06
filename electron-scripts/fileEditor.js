@@ -40,7 +40,7 @@ module.exports.loadFileEditor = function (receivedContents = contents) {
 
 function createCards(value,index) {
 	contents.send('list', server.options.files.map((value, index) => `
-		<div class="uk-card uk-padding-small uk-card-secondary" style="height: 90px">
+		<div class="uk-card uk-padding-small" style="height: 90px">
 			<div class="uk-float uk-float-left" onclick="listClicked(${index})">
 				<span class="uk-text-large">${path.basename(value)}</span>
 				<br>
