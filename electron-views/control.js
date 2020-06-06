@@ -83,26 +83,40 @@ ipcRenderer.on('version', (event, message) => {
 });
 
 ipcRenderer.on('update', (event, message) => {
-	document.getElementById('selected-dest').innerHTML = message.dest;
-	if(message.list !== '') document.getElementById('selected-list').innerHTML = message.list;
-	else document.getElementById('selected-list').innerHTML = 'No list file selected!';
-	document.getElementById('port').innerHTML = message.port;
-	if(message.files.length) {
-		if(message.files.length === 1) document.getElementById('selected-files').innerHTML = '1 file selected. <u>Click to view/edit.</u>';
-		else document.getElementById('selected-files').innerHTML = message.files.length +' files selected. <u>Click to view/edit.</u>';
-	}
-	else document.getElementById('selected-files').innerHTML = 'No files selected';
-	if(message.version === 'latest') document.getElementById('version').setAttribute("uk-tooltip","Latest version");
-	else if(message.version === 'old') document.getElementById('version').setAttribute("uk-tooltip","Newer version available, click to view");
+	parseOptions(message);
 });
 
 ipcRenderer.on('refresh', (event, message) => {
-	if(message === 'needed') {
+	refresh(message);
+});
+
+ipcRenderer.on('load', (event, message) => {
+	parseOptions(message.options);
+	refresh(message.refreshNeeded);
+	document.getElementById('version').innerHTML = message.version;
+});
+
+function refresh(refreshNeeded) {
+	if(refreshNeeded === 'needed') {
 		document.getElementById('refresh-server').style.display = 'inline-block';
 		document.getElementById('server-refresh').style.display = 'inline-block';
 	}
-	else if(message === 'done') {
+	else if(refreshNeeded === 'done') {
 		document.getElementById('refresh-server').style.display = 'none';
 		document.getElementById('server-refresh').style.display = 'none';
 	}
-});
+}
+
+function parseOptions(options) {
+	document.getElementById('selected-dest').innerHTML = options.dest;
+	if(options.list !== '') document.getElementById('selected-list').innerHTML = options.list;
+	else document.getElementById('selected-list').innerHTML = 'No list file selected!';
+	document.getElementById('port').innerHTML = options.port;
+	if(options.files.length) {
+		if(options.files.length === 1) document.getElementById('selected-files').innerHTML = '1 file selected. <u>Click to view/edit.</u>';
+		else document.getElementById('selected-files').innerHTML = options.files.length +' files selected. <u>Click to view/edit.</u>';
+	}
+	else document.getElementById('selected-files').innerHTML = 'No files selected';
+	if(options.version === 'latest') document.getElementById('version').setAttribute("uk-tooltip","Latest version");
+	else if(options.version === 'old') document.getElementById('version').setAttribute("uk-tooltip","Newer version available, click to view");
+}

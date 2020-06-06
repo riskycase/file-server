@@ -1,15 +1,57 @@
 const http = require('http');
+const { app } = require('electron');
 const os = require('os');
 
 let server;
 let contents;
-let options;
+
+module.exports.options = options = {
+	_files: [],
+	get files() {
+		return this._files;
+	},
+	set files(files) {
+		this._files = files;
+	},
+	_list: '',
+	get list() {
+		return this._list;
+	},
+	set list(list) {
+		this._list = list;
+		optionsChanged();
+	},
+	_dest: app.getPath('downloads'),
+	get dest() {
+		return this._dest;
+	},
+	set dest(dest) {
+		this._dest = dest;
+		optionsChanged();
+	},
+	_port: 3000,
+	get port() {
+		return this._port;
+	},
+	set port(port) {
+		this._port = port;
+	},
+	_version: 'unchecked',
+	get version() {
+		return this._version;
+	},
+	set version(version) {
+		this._version = version;
+	}
+};
+
+module.exports.optionsChanged = optionsChanged;
 
 module.exports.killServer = killServer;
 
 module.exports.destroyServer = destroyServer;
 
-module.exports.refreshServer = function (options) {
+module.exports.refreshServer = function () {
 	require('../server/middleware/storage').init({
 		input: options.files,
 		flags: {
@@ -20,9 +62,8 @@ module.exports.refreshServer = function (options) {
 	contents.send('refresh', 'done');
 }
 
-module.exports.launchServer = function (receivedContents = contents, receivedOptions = options) {
+module.exports.launchServer = function (receivedContents) {
 	contents = receivedContents;
-	options = receivedOptions;
 	contents.send('status', 'initiating');
 	require('../server/app')({
 		input: options.files,
@@ -38,6 +79,10 @@ module.exports.isServerListening = function () {
 }
 
 module.exports.serverListening = serverListening;
+
+function optionsChanged() {
+	if(server && server.listening) contents.send('refresh', 'needed');
+}
 
 function getAddresses() {
 	const ni = os.networkInterfaces();
@@ -69,8 +114,7 @@ function serverErrored(err) {
 }
 
 function killServer() {
-	if(server && server.listening)
-		server.close();	
+	if(server && server.listening) server.close();	
 }
 
 function destroyServer() {

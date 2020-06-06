@@ -7,54 +7,14 @@ const server = require('./server.js');
 let contents;
 let refreshNeeded = false;
 
-const options = {
-	_files: [],
-	get files() {
-		return this._files;
-	},
-	set files(files) {
-		this._files = files;
-	},
-	_list: '',
-	get list() {
-		return this._list;
-	},
-	set list(list) {
-		this._list = list;
-		optionsChanged();
-	},
-	_dest: app.getPath('downloads'),
-	get dest() {
-		return this._dest;
-	},
-	set dest(dest) {
-		this._dest = dest;
-		optionsChanged();
-	},
-	_port: 3000,
-	get port() {
-		return this._port;
-	},
-	set port(port) {
-		this._port = port;
-	},
-	_version: 'unchecked',
-	get version() {
-		return this._version;
-	},
-	set version(version) {
-		this._version = version;
-	}
-};
-
 //Check for the latest version
 require('https').get('https://raw.githubusercontent.com/riskycase/file-server/deploy/package.json', (res) => {
 	res.setEncoding('utf8');
 	let body = '';
 	res.on('data', (chunk) => { body += chunk; });
 	res.on('end', () => {
-		if(JSON.parse(body).version === app.getVersion()) options.version = 'latest';
-		else options.version = 'old';
+		if(JSON.parse(body).version === app.getVersion()) server.options.version = 'latest';
+		else server.options.version = 'old';
 	});
 });
 
@@ -62,12 +22,10 @@ module.exports.refreshNeeded = () => refreshNeeded = true;
 
 module.exports.loadControl = function (receivedContents = contents) {
 	contents = receivedContents;
-	BrowserWindow.fromWebContents(contents).loadFile(path.resolve(__dirname, '../electron-views/control.html'));
-	contents.on('did-finish-load', () => {
-		contents.send('update', options);
-		contents.send('version', app.getVersion());
+	BrowserWindow.fromWebContents(contents).loadFile(path.resolve(__dirname, '../electron-views/control.html'))
+	.then(() => {
+		contents.send('load', {options: server.options, refreshNeeded: refreshNeeded && server.isServerListening() ? 'needed' : 'done', version: app.getVersion()});
 		if(server.isServerListening()) server.serverListening();
-		if(refreshNeeded) optionsChanged();
 	});
 }
 
@@ -77,20 +35,15 @@ ipcMain.on('input', (event, message, ...args) => {
 	else if (message === 'list-select') listSelector();
 	else if (message === 'dest-select') destSelector();
 	else if (message === 'port') portSelector(message, ...args);
-	else if (message === 'version' && options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
-	else if (message === 'start-server') server.launchServer(contents, options);
+	else if (message === 'version' && server.options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
+	else if (message === 'start-server') server.launchServer(contents);
 	else if (message === 'kill-server') server.destroyServer();
-	else if (message === 'refresh-server') server.refreshServer(options);
+	else if (message === 'refresh-server') server.refreshServer();
 });
 
 ipcMain.on('click', (event, message) => {
-	if (message === 'selected-files') fileEditor.loadFileEditor(contents, options);
+	if (message === 'selected-files') fileEditor.loadFileEditor(contents);
 });
-
-function optionsChanged() {
-	if(server.isServerListening()) contents.send('refresh', 'needed');
-	refreshNeeded = false;
-}
 
 function shareSelector (type) {
 	let properties = ['multiSelections', 'showHiddenFiles', 'dontAddToRecent'];
@@ -113,14 +66,15 @@ function shareSelector (type) {
 		if(!result.canceled) {
 			result.filePaths.forEach(pushUnique);
 		}
-		contents.send('update', options);
+		contents.send('update', server.options);
 	});
 }
 
 function pushUnique(item) {
-	if (options.files.indexOf(item) === -1) {
-		options.files.push(item);
-		optionsChanged();
+	if (server.options.files.indexOf(item) === -1) {
+		server.options.files.push(item);
+		server.optionsChanged();
+		refreshNeeded = false;
 	}
 }
 
@@ -130,9 +84,9 @@ function listSelector () {
 		buttonLabel: 'Use this list',
 		properties: ['openFile', 'showHiddenFiles', 'dontAddToRecent']
 	}).then(result => {
-		if(!result.canceled) options.list = result.filePaths[0];
-		else options.list = '';
-		contents.send('update', options);
+		if(!result.canceled) server.options.list = result.filePaths[0];
+		else server.options.list = '';
+		contents.send('update', server.options);
 	});
 }
 
@@ -142,12 +96,12 @@ function destSelector () {
 		buttonLabel: 'Save here',
 		properties: ['openDirectory', 'showHiddenFiles', 'dontAddToRecent', 'createDirectory', 'promptToCreate']
 	}).then(result => {
-		if(!result.canceled) options.dest = result.filePaths[0];
-		else options.dest = app.getPath('downloads');
-		contents.send('update', options);
+		if(!result.canceled) server.options.dest = result.filePaths[0];
+		else server.options.dest = app.getPath('downloads');
+		contents.send('update', server.options);
 	});
 }
 
 function portSelector(message, port) {
-	options.port = port;
+	server.options.port = port;
 }
