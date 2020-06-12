@@ -3,8 +3,7 @@ const path = require('path');
 
 const fileEditor = require('./fileEditor.js');
 const server = require('./server.js');
-
-let contents;
+const preferences = require('./preferences.js');
 let refreshNeeded = false;
 
 //Check for the latest version
@@ -20,29 +19,29 @@ require('https').get('https://raw.githubusercontent.com/riskycase/file-server/de
 
 module.exports.refreshNeeded = () => refreshNeeded = true;
 
-module.exports.loadControl = function (receivedContents = contents) {
-	contents = receivedContents;
-	BrowserWindow.fromWebContents(contents).loadFile(path.resolve(__dirname, '../electron-views/control.html'))
+module.exports.loadControl = function () {
+	BrowserWindow.fromWebContents(preferences.getContents()).loadFile(path.resolve(__dirname, '../electron-views/control.html'))
 	.then(() => {
-		contents.send('load', {options: server.options, refreshNeeded: refreshNeeded && server.isServerListening() ? 'needed' : 'done', version: app.getVersion()});
+		preferences.getContents().send('load', {options: server.options, refreshNeeded: refreshNeeded && server.isServerListening() ? 'needed' : 'done', version: app.getVersion()});
 		if(server.isServerListening()) server.serverListening();
 	});
 }
 
-ipcMain.on('input', (event, message, ...args) => {
-	if (message === 'file-select') shareSelector('file');
-	else if (message === 'folder-select') shareSelector('folder');
-	else if (message === 'list-select') listSelector();
-	else if (message === 'dest-select') destSelector();
-	else if (message === 'port') portSelector(message, ...args);
-	else if (message === 'version' && server.options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
-	else if (message === 'start-server') server.launchServer(contents);
-	else if (message === 'kill-server') server.destroyServer();
-	else if (message === 'refresh-server') server.refreshServer();
+ipcMain.on('input', (event, element, ...args) => {
+	if (element === 'preferences') preferences.loadPreferences();
+	else if (element === 'file-select') shareSelector('file');
+	else if (element === 'folder-select') shareSelector('folder');
+	else if (element === 'list-select') listSelector();
+	else if (element === 'dest-select') destSelector();
+	else if (element === 'port') portSelector(...args);
+	else if (element === 'version' && server.options.version === 'old') shell.openExternal('https://github.com/riskycase/file-server/releases');
+	else if (element === 'start-server') server.launchServer();
+	else if (element === 'kill-server') server.destroyServer();
+	else if (element === 'refresh-server') server.refreshServer();
 });
 
-ipcMain.on('click', (event, message) => {
-	if (message === 'selected-files') fileEditor.loadFileEditor(contents);
+ipcMain.on('click', (event, element) => {
+	if (element === 'selected-files') fileEditor.loadFileEditor();
 });
 
 function shareSelector (type) {
@@ -66,7 +65,7 @@ function shareSelector (type) {
 		if(!result.canceled) {
 			result.filePaths.forEach(pushUnique);
 		}
-		contents.send('update', server.options);
+		preferences.getContents().send('update', server.options);
 	});
 }
 
@@ -86,7 +85,7 @@ function listSelector () {
 	}).then(result => {
 		if(!result.canceled) server.options.list = result.filePaths[0];
 		else server.options.list = '';
-		contents.send('update', server.options);
+		preferences.getContents().send('update', server.options);
 	});
 }
 
@@ -98,10 +97,10 @@ function destSelector () {
 	}).then(result => {
 		if(!result.canceled) server.options.dest = result.filePaths[0];
 		else server.options.dest = app.getPath('downloads');
-		contents.send('update', server.options);
+		preferences.getContents().send('update', server.options);
 	});
 }
 
-function portSelector(message, port) {
+function portSelector(port) {
 	server.options.port = port;
 }

@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 
 const control = require('./electron-scripts/control.js');
+const preferences = require('./electron-scripts/preferences.js');
 const server = require('./electron-scripts/server.js');
 
 function createWindow () {
@@ -17,9 +18,9 @@ function createWindow () {
 	
 	win.setMenuBarVisibility(false);
 	
-	contents = win.webContents;
+	preferences.setContents(win.webContents);
 	
-	control.loadControl(contents);
+	control.loadControl();
 }
 
 // This method will be called when Electron has finished

@@ -1,9 +1,9 @@
 const http = require('http');
-const { app } = require('electron');
 const os = require('os');
 
+const preferences = require('./preferences.js');
+
 let server;
-let contents;
 
 module.exports.options = options = {
 	_files: [],
@@ -13,28 +13,31 @@ module.exports.options = options = {
 	set files(files) {
 		this._files = files;
 	},
-	_list: '',
+	_list: preferences.store.get('list'),
 	get list() {
 		return this._list;
 	},
 	set list(list) {
 		this._list = list;
 		optionsChanged();
+		preferences.store.set('list', list);
 	},
-	_dest: app.getPath('downloads'),
+	_dest: preferences.store.get('destination'),
 	get dest() {
 		return this._dest;
 	},
 	set dest(dest) {
 		this._dest = dest;
 		optionsChanged();
+		preferences.store.set('destination', dest);
 	},
-	_port: 3000,
+	_port: preferences.store.get('port'),
 	get port() {
 		return this._port;
 	},
 	set port(port) {
 		this._port = port;
+		preferences.store.set('port', parseInt(port, 10));
 	},
 	_version: 'unchecked',
 	get version() {
@@ -59,12 +62,11 @@ module.exports.refreshServer = function () {
 			list: options.list,
 		}
 	});
-	contents.send('refresh', 'done');
+	preferences.getContents().send('refresh', 'done');
 }
 
-module.exports.launchServer = function (receivedContents) {
-	contents = receivedContents;
-	contents.send('status', 'initiating');
+module.exports.launchServer = function () {
+	preferences.getContents().send('status', 'initiating');
 	require('../server/app')({
 		input: options.files,
 		flags: {
@@ -81,7 +83,7 @@ module.exports.isServerListening = function () {
 module.exports.serverListening = serverListening;
 
 function optionsChanged() {
-	if(server && server.listening) contents.send('refresh', 'needed');
+	if(server && server.listening) preferences.getContents().send('refresh', 'needed');
 }
 
 function getAddresses() {
@@ -95,22 +97,22 @@ function getAddresses() {
 }
 
 function createServer(app) {
-	contents.send('status', 'initiated');
+	preferences.getContents().send('status', 'initiated');
 	server = http.createServer(app);
-	contents.send('status', 'created');
+	preferences.getContents().send('status', 'created');
 	server.listen(options.port);
 	server.on('listening', serverListening);
 	server.on('error', serverErrored);
 }
 
 function serverListening() {
-	contents.send('status', 'binded');
-	contents.send('address', getAddresses());
+	preferences.getContents().send('status', 'binded');
+	preferences.getContents().send('address', getAddresses());
 }
 
 function serverErrored(err) {
-	if(err.code === 'EADDRINUSE') contents.send('status', 'port-used');
-	if(err.code === 'EACCES') contents.send('status', 'port-err');
+	if(err.code === 'EADDRINUSE') preferences.getContents().send('status', 'port-used');
+	if(err.code === 'EACCES') preferences.getContents().send('status', 'port-err');
 }
 
 function killServer() {
@@ -118,7 +120,7 @@ function killServer() {
 }
 
 function destroyServer() {
-	contents.send('status', 'closing');	
+	preferences.getContents().send('status', 'closing');	
 	killServer();
-	contents.send('status', 'closed');
+	preferences.getContents().send('status', 'closed');
 }

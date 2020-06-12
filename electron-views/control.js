@@ -1,5 +1,9 @@
 const { ipcRenderer } = require('electron');
 
+document.getElementById('preferences').addEventListener('click', () => {
+	ipcRenderer.send('input', 'preferences');
+});
+
 document.getElementById('file-select').addEventListener('click', () => {
 	ipcRenderer.send('input', 'file-select');
 });
@@ -111,7 +115,7 @@ function parseOptions(options) {
 	document.getElementById('selected-dest').innerHTML = options.dest;
 	if(options.list !== '') document.getElementById('selected-list').innerHTML = options.list;
 	else document.getElementById('selected-list').innerHTML = 'No list file selected!';
-	document.getElementById('port').innerHTML = options.port;
+	document.getElementById('version').innerHTML = options.port;
 	if(options.files.length) {
 		if(options.files.length === 1) document.getElementById('selected-files').innerHTML = '1 file selected. <u>Click to view/edit.</u>';
 		else document.getElementById('selected-files').innerHTML = options.files.length +' files selected. <u>Click to view/edit.</u>';
@@ -119,4 +123,5 @@ function parseOptions(options) {
 	else document.getElementById('selected-files').innerHTML = 'No files selected';
 	if(options.version === 'latest') document.getElementById('version').setAttribute("uk-tooltip","Latest version");
 	else if(options.version === 'old') document.getElementById('version').setAttribute("uk-tooltip","Newer version available, click to view");
+	document.getElementById('port').value = options.port;
 }
