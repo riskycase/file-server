@@ -25,7 +25,7 @@ module.exports.loadControl = function () {
 		preferences.getContents().send('load', {options: server.options, refreshNeeded: refreshNeeded && server.isServerListening() ? 'needed' : 'done', version: app.getVersion()});
 		if(server.isServerListening()) server.serverListening();
 	});
-}
+};
 
 ipcMain.on('input', (event, element, ...args) => {
 	if (element === 'preferences') preferences.loadPreferences();

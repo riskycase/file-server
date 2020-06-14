@@ -64,7 +64,7 @@ module.exports.refreshServer = function () {
 		}
 	});
 	preferences.getContents().send('refresh', 'done');
-}
+};
 
 module.exports.launchServer = function () {
 	preferences.getContents().send('status', 'initiating');
@@ -75,11 +75,11 @@ module.exports.launchServer = function () {
 			list: options.list,
 		}
 	}).then(createServer);
-}
+};
 
 module.exports.isServerListening = function () {
 	return server ? server.listening : false;
-}
+};
 
 module.exports.serverListening = serverListening;
 

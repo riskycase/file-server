@@ -43,7 +43,7 @@ module.exports.setContents = (receivedContents) => {
 	contents.on('did-finish-load', () =>{
 		contents.executeJavaScript(`applyTheme({color: '${store.get('color')}',darkMode: ${store.get('darkMode')}})`);
 	});
-}
+};
 
 module.exports.getContents = () => contents;
 
@@ -53,7 +53,7 @@ module.exports.loadPreferences = function (receivedContents = contents) {
 	.then(() => {
 		contents.send('load', {	color: store.get('color'),darkMode: store.get('darkMode')});
 	});
-}
+};
 
 ipcMain.on('input', (event, element, object) => {
 	if (element === 'cancel') control.loadControl();

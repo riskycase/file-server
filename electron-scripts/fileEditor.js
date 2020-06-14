@@ -7,7 +7,7 @@ const preferences = require('./preferences.js');
 
 ipcMain.on('input', (event, element, ...args) => {
 	if (element === 'clear-all') clearList();
-	else if (element === 'done') control.loadControl();;
+	else if (element === 'done') control.loadControl();
 });
 
 ipcMain.on('remove', (event, index) => {
@@ -34,7 +34,7 @@ module.exports.loadFileEditor = function () {
 			createCards();
 		});
 	}
-}
+};
 
 function createCards(value,index) {
 	preferences.getContents().send('list', server.options.files.map((value, index) => `

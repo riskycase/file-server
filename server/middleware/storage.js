@@ -80,7 +80,7 @@ async function readLines(listPath) {
 }
 
 function fileMaker(path) {
-	return {path:path, size: undefined, folder: undefined}
+	return {path:path, size: undefined, folder: undefined};
 }
 
 function calcSize(file) {
