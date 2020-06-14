@@ -39,9 +39,11 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = async function(cli){
+module.exports.init = async function(cli){
 	
 	await require('./middleware/storage').init(cli);
 	return app;
 	
 };
+
+module.exports.refresh = require('./middleware/storage').update;

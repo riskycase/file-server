@@ -2,6 +2,7 @@ const http = require('http');
 const os = require('os');
 
 const preferences = require('./preferences.js');
+const app = require('../server/app');
 
 let server;
 
@@ -55,7 +56,7 @@ module.exports.killServer = killServer;
 module.exports.destroyServer = destroyServer;
 
 module.exports.refreshServer = function () {
-	require('../server/middleware/storage').init({
+	app.refresh({
 		input: options.files,
 		flags: {
 			destination: options.dest,
@@ -67,7 +68,7 @@ module.exports.refreshServer = function () {
 
 module.exports.launchServer = function () {
 	preferences.getContents().send('status', 'initiating');
-	require('../server/app')({
+	app.init({
 		input: options.files,
 		flags: {
 			destination: options.dest,

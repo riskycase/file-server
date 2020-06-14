@@ -53,7 +53,7 @@ function testInvalidDownload (done, index) {
 describe('When sharing a single file', () => {
 
 	before(function (done){
-		require('../server/app')({
+		require('../server/app').init({
 			input: ['dummy/dummy-down.txt'],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})

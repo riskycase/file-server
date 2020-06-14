@@ -53,7 +53,7 @@ function testInvalidDownload (done, index) {
 describe('When sharing with repititions', () => {
 
 	before(function (done){
-		require('../server/app')({
+		require('../server/app').init({
 			input: ['dummy/dummy-down.txt'],
 			flags: {destination: 'dummy/uploads', list: 'dummy/dummy-list-long.txt'}
 		})

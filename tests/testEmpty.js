@@ -14,7 +14,7 @@ var app;
 describe('When not sharing anything', () => {
 
 	before(function (done){
-		require('../server/app')({
+		require('../server/app').init({
 			input: [],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})

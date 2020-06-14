@@ -11,7 +11,7 @@ describe('Miscalleneous tests', () => {
 
 	before(function (done){
 		fs.rmdirSync('dummy/uploads', {recursive:true});
-		require('../server/app', {})({
+		require('../server/app').init({
 			input: ['dummy/dummy-up.txt'],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
