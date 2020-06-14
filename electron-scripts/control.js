@@ -102,5 +102,5 @@ function destSelector () {
 }
 
 function portSelector(port) {
-	server.options.port = port;
+	if(parseInt(port)) server.options.port = port;
 }
