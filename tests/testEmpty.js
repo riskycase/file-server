@@ -35,7 +35,7 @@ describe('When not sharing anything', () => {
 	
 	it('it should not open any download', (done) => {
 		chai.request(app)
-		.get('/download')
+		.get('/download/all')
 		.end((err, res) => {
 			res.should.have.property('status',403);
 			done();
@@ -44,9 +44,9 @@ describe('When not sharing anything', () => {
 	
 	it('it should not open any download with data specified', (done) => {
 		chai.request(app)
-		.post('/download')
-		.send({
-			file: '0'
+		.get('/download/single')
+		.query({
+			index: '0'
 		})
 		.end((err, res) => {
 			res.should.have.property('status',403);
@@ -81,9 +81,9 @@ describe('When not sharing anything', () => {
 	
 	it('it should download uploaded file', (done) => {
 		chai.request(app)
-		.post('/download')
-		.send({
-			file: '0'
+		.get('/download/single')
+		.query({
+			index: '0'
 		})
 		.end((err, res) => {
 			res.should.have.property('status',200);
@@ -96,9 +96,9 @@ describe('When not sharing anything', () => {
 	
 	it('it should not open any download other than shared file', (done) => {
 		chai.request(app)
-		.post('/download')
-		.send({
-			file: '1'
+		.get('/download/single')
+		.query({
+			index: '1'
 		})
 		.end((err, res) => {
 			res.should.have.property('status',400);
@@ -108,7 +108,7 @@ describe('When not sharing anything', () => {
 	
 	it('it should download a zip with name allFiles.zip', (done) => {
 		chai.request(app)
-		.get('/download')
+		.get('/download/all')
 		.end((err, res) => {
 			res.should.have.property('status',200);
 			res.header.should.have.property('content-type', 'application/zip');

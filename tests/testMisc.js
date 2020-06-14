@@ -12,13 +12,27 @@ describe('Miscalleneous tests', () => {
 	before(function (done){
 		fs.rmdirSync('dummy/uploads', {recursive:true});
 		require('../server/app', {})({
-			input: [],
+			input: ['dummy/dummy-up.txt'],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
 		.then((generatedApp) => {
 			app = generatedApp;
 			done();
 		});	
+	});
+
+	it('it should return correct API response', (done) => {
+		chai.request(app)
+		.get('/download/list')
+		.end((err, res) => {
+			res.body.should.be.an('array');
+			res.body.length.should.equal(1);
+			res.body[0].should.have.property('name', 'dummy-up.txt');
+			res.body[0].should.have.property('isFolder', false);
+			res.body[0].should.have.property('size', 4273);
+			res.body[0].should.have.property('index', 0);
+			done();
+		});
 	});
 
 	it('it should 404 for invalid paths - 1', (done) => {

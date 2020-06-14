@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 const zip = require('express-easy-zip');
 
-const downloadRouter = require('./routes/download');
 const indexRouter = require('./routes/index');
+const downloadRouter = require('./routes/download');
 
 const app = express();
 

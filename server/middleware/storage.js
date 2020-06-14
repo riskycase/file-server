@@ -23,6 +23,14 @@ const formRow = (file, index) => ({
 	'index': index
 });
 
+// Form the raw object that will be sent on API request
+const formRaw = (file, index) => ({
+	'name': path.basename(file.path),
+	'isFolder': file.folder,
+	'size': file.size || -1,
+	'index': index
+});
+
 // Get the icon of the file/folder given file path
 const getIcon = (ext) => icons.find((value) => ext.match(value[1]))[0];
 
@@ -80,10 +88,7 @@ function calcSize(file) {
 	file.folder = fs.existsSync(file.path) && fs.lstatSync(file.path).isDirectory();
 }
 
-const upload = multer({ storage: storage });
-
-module.exports.init = async function(cli) {
-	
+async function updateServer(cli) {
 	sharedFiles = cli.input.filter((value, index, self) => self.indexOf(value) === index).map(fileMaker);
 	destination = cli.flags.destination;
 	
@@ -95,12 +100,20 @@ module.exports.init = async function(cli) {
 	if(cli.flags.list !== '') await readLines(cli.flags.list);
 	
 	sharedFiles.forEach(calcSize);
-	
+}
+
+const upload = multer({ storage: storage });
+
+module.exports.init = async function(cli) {
+	await updateServer(cli);
 	receivedFiles = [];
-	
 };
 
+module.exports.update = updateServer;
+
 module.exports.getRows = () => sharedFiles.concat(receivedFiles).map(formRow);
+
+module.exports.rawFiles = () => sharedFiles.concat(receivedFiles).map(formRaw);
 
 module.exports.getPaths = () => sharedFiles.concat(receivedFiles).map(fileObject => fileObject.path);
 
