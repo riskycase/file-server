@@ -13,7 +13,7 @@ var app;
 
 function downloadAllTest(done) {
 	chai.request(app)
-	.get('/download')
+	.get('/download/all')
 	.end((err, res) => {
 		res.should.have.property('status',200);
 		res.header.should.have.property('content-type', 'application/zip');
@@ -25,9 +25,9 @@ function downloadAllTest(done) {
 
 function testValidDownload (done, index) {
 	chai.request(app)
-	.post('/download')
-	.send({
-		file: index
+	.get('/download/single')
+	.query({
+		index: index
 	})
 	.end((err, res) => {
 		res.should.have.property('status',200);
@@ -40,9 +40,9 @@ function testValidDownload (done, index) {
 
 function testInvalidDownload (done, index) {
 	chai.request(app)
-	.post('/download')
-	.send({
-		file: index
+	.get('/download/single')
+	.query({
+		index: index
 	})
 	.end((err, res) => {
 		res.should.have.property('status',400);
@@ -53,7 +53,7 @@ function testInvalidDownload (done, index) {
 describe('When sharing a single file', () => {
 
 	before(function (done){
-		require('../server/app')({
+		require('../server/app').init({
 			input: ['dummy/dummy-down.txt'],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
@@ -109,9 +109,9 @@ describe('When sharing a single file', () => {
 	
 	it('it should download uploaded file', (done) => {
 		chai.request(app)
-		.post('/download')
-		.send({
-			file: '1'
+		.get('/download/single')
+		.query({
+			index: '1'
 		})
 		.end((err, res) => {
 			res.should.have.property('status',200);

@@ -1,6 +1,6 @@
 {
 	"name": "broadcast-em",
-	"version": "1.2.0",
+	"version": "2.0.0",
 	"description": "A file server based on node.js that allows sharing files over HTTP on the same local network, and possibly over the internet if bridging is used",
 	"author": "Hrishikesh Patil",
 	"private": true,
@@ -20,6 +20,7 @@
 	"dependencies": {
 		"debug": "~4.1.1",
 		"ejs": "^3.1.2",
+		"electron-store": "^5.2.0",
 		"express": "~4.17.1",
 		"express-easy-zip": "^1.1.5",
 		"meow": "^7.0.1",

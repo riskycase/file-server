@@ -6,31 +6,27 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<!-- UIkit CSS-->
 		<link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.css">
+		<link rel="stylesheet" href="./uikit-extentions.css">
 		<!-- UIkit JS-->
 		<script src="../node_modules/uikit/dist/js/uikit.js"></script>
 		<script src="../node_modules/uikit/dist/js/uikit-icons.js"></script>
 		
-		<title>Broadcast 'em - Control Panel</title>
+		<!-- Theme JS-->
+		<script src="./theme.js"></script>
+		
+		<title>Broadcast 'em - File Editor</title>
 		<style>
-			@font-face {
-				font-family: 'Source Sans Pro';
-				src: local('SourceSansPro'), url('../server/public/fonts/SourceSansPro-Regular.ttf') format('truetype');
-			}
-
 			body {
-				font-family: 'Source Sans Pro';
-				height: 100vh;
 				overflow: hidden;
-				background: #333;
 			}
 		</style>
 	</head>
 	
-	<body>
+	<body class="uk-background-secondary uk-light">
   
 		<header>
-			<div uk-sticky="animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky uk-navbar-transparent; cls-inactive: uk-navbar-transparent uk-light; top: 200">
-				<nav class="uk-navbar-container uk-background-primary uk-padding-small" uk-navbar>
+			<div class="uk-navbar-container uk-light">
+				<nav id="banner" class="uk-navbar uk-padding-small background-light-blue" uk-navbar>
 				
 					<div class="uk-navbar-left">
 						

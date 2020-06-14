@@ -2,12 +2,18 @@ const router = require('express').Router();
 const storage = require('../middleware/storage');
 const path = require('path');
 
+/* Send a JSON array containing file details in a list */
+router.get('/list', (req, res, next) => {
+	res.json(storage.rawFiles());
+});
+
 /* Download single file */
-router.post('/', (req, res, next) => {
+router.get('/single', (req, res, next) => {
+	const index = parseInt(req.query.index, 10);
 	const pathArray = storage.getPaths();
-	if( req.body.file >= 0 && req.body.file < pathArray.length ) {
-		const filePath = pathArray[req.body.file];
-		if ( storage.isFolder(req.body.file) ) {
+	if( pathArray[index] ) {
+		const filePath = pathArray[index];
+		if ( storage.isFolder(index) ) {
 			const name = path.basename(filePath);
 			const namezip = name + '.zip';
 			res.zip({
@@ -34,7 +40,7 @@ router.post('/', (req, res, next) => {
 });
 
 /* Download all files */
-router.get('/', (req, res, next) => {
+router.get('/all', (req, res, next) => {
 	const pathArray = storage.getPaths();
 	if( pathArray.length > 0 ) {
 		const filesJSON = pathArray.map( function(value) {

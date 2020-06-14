@@ -1,3 +1,10 @@
+v2.0.0
+
+App UI now supports themeing from the settings page
+When options are changed, you will be informed that the server needs to be refreshed to apply the new options
+Startup should now be quicker if large number of files are selected
+Advanced users can now use API endpoints for downloading
+
 v1.2.0
 
 Tweaked the editor UI to view the files on the host machine
