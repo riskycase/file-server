@@ -12,7 +12,7 @@ describe('Miscalleneous tests', () => {
 	before(function (done){
 		fs.rmdirSync('dummy/uploads', {recursive:true});
 		require('../server/app').init({
-			input: ['dummy/dummy-up.txt'],
+			input: ['dummy/dummy-folder/dummy-small.txt'],
 			flags: {destination: 'dummy/uploads', list: ''}
 		})
 		.then((generatedApp) => {
@@ -27,9 +27,9 @@ describe('Miscalleneous tests', () => {
 		.end((err, res) => {
 			res.body.should.be.an('array');
 			res.body.length.should.equal(1);
-			res.body[0].should.have.property('name', 'dummy-up.txt');
+			res.body[0].should.have.property('name', 'dummy-small.txt');
 			res.body[0].should.have.property('isFolder', false);
-			res.body[0].should.have.property('size', 4273);
+			res.body[0].should.have.property('size', fs.statSync('dummy/dummy-folder/dummy-small.txt').size);
 			res.body[0].should.have.property('index', 0);
 			done();
 		});
