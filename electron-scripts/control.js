@@ -7,7 +7,7 @@ const preferences = require('./preferences.js');
 let refreshNeeded = false;
 
 //Check for the latest version
-require('https').get('https://raw.githubusercontent.com/riskycase/file-server/deploy/package.json', (res) => {
+require('https').get('https://raw.githubusercontent.com/riskycase/broadcastem-electron/trunk/package.json', (res) => {
 	res.setEncoding('utf8');
 	let body = '';
 	res.on('data', (chunk) => { body += chunk; });
